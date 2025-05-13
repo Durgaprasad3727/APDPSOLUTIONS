@@ -12,7 +12,7 @@
     html, body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
-      background: #f9f9f9;
+      background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
       color: #333;
       scroll-behavior: smooth;
     }
@@ -22,34 +22,23 @@
       text-align: center;
       padding: 4rem 1rem 2rem 1rem;
       position: relative;
-      animation: fadeInDown 1s ease-in-out;
+      animation: slideInFromTop 1s ease-in-out;
     }
-    @keyframes fadeInDown {
-      0% { opacity: 0; transform: translateY(-30px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-    .header-logo-title {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-    }
-    .header-logo-title img {
-      height: 50px;
-      animation: fadeIn 2s ease-in-out;
+    @keyframes slideInFromTop {
+      0% { transform: translateY(-100%); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
     }
     header h1 {
-      font-size: 2.5rem;
+      font-size: 2.8rem;
       margin: 0;
-      animation: bounceIn 1.5s;
+      animation: scaleIn 1.2s ease-in-out;
     }
-    @keyframes bounceIn {
-      0% { transform: scale(0.5); opacity: 0; }
-      60% { transform: scale(1.2); opacity: 1; }
-      100% { transform: scale(1); }
+    @keyframes scaleIn {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
     .subtitle {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       margin-top: 0.5rem;
       font-weight: 300;
       animation: fadeInUp 2s ease-in;
@@ -58,7 +47,7 @@
       0% { opacity: 0; transform: translateY(30px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-    .form-section, .info-section, .contact-section {
+    section {
       animation: fadeIn 1s ease-in;
     }
     @keyframes fadeIn {
@@ -70,8 +59,17 @@
       max-width: 500px;
       margin: 2rem auto;
       padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      animation: slideInUp 1.2s ease-in-out;
+    }
+    @keyframes slideInUp {
+      0% { transform: translateY(40px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    .form-section:hover {
+      transform: translateY(-5px);
     }
     .form-section h2 {
       text-align: center;
@@ -90,7 +88,7 @@
       padding: 0.7em;
       margin-top: 0.3em;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 8px;
     }
     .form-buttons {
       display: flex;
@@ -99,39 +97,40 @@
     }
     button {
       padding: 0.7em 1.2em;
-      background: #005792;
+      background: linear-gradient(to right, #00b4db, #0083b0);
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
       font-weight: bold;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, transform 0.2s;
     }
     button:hover {
-      background: #003f63;
+      transform: scale(1.05);
     }
     .info-section {
       max-width: 800px;
       margin: 2rem auto;
       background: #fff;
       padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
     .info-section h2 {
       color: #005792;
       margin-bottom: 1rem;
     }
     .info-section p {
-      line-height: 1.6;
+      line-height: 1.7;
     }
     .contact-section {
       text-align: center;
       padding: 2rem;
-      background-color: #e3f2fd;
+      background: linear-gradient(to right, #e3f2fd, #cce7ff);
       margin: 2rem auto;
       max-width: 800px;
-      border-radius: 10px;
+      border-radius: 15px;
+      animation: fadeIn 2s ease-in-out;
     }
     .contact-section a {
       display: inline-block;
@@ -150,6 +149,14 @@
       vertical-align: middle;
       margin-right: 8px;
     }
+    .launch-info {
+      text-align: center;
+      padding: 1rem;
+      font-weight: bold;
+      color: #d32f2f;
+      font-size: 1.2rem;
+      animation: fadeIn 2s ease-in-out;
+    }
     footer {
       background: #00274d;
       color: white;
@@ -162,12 +169,11 @@
 </head>
 <body>
   <header>
-    <div class="header-logo-title">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Font_Awesome_5_regular_gem.svg/1024px-Font_Awesome_5_regular_gem.svg.png" alt="APDPSOLUTIONS Logo">
-      <h1>APDPSOLUTIONS</h1>
-    </div>
+    <h1>APDPSOLUTIONS</h1>
     <div class="subtitle">Unlock your financial potential with our investment strategies</div>
   </header>
+
+  <div class="launch-info">🚀 We will launch our official website soon. This is our pre-launch version.</div>
 
   <section class="form-section">
     <h2>Client Registration</h2>
