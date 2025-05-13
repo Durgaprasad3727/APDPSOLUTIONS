@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -138,19 +138,22 @@
 <body>
   <header>
     <div class="header-logo-title">
-      <img src="WhatsApp Image 2025-05-12 at 12.57.13 PM.jpeg" alt="APDPSOLUTIONS Logo" />
+      <img src="WhatsApp_Image_2025-05-12_at_12.57.13_PM-removebg-preview.png" alt="APDPSOLUTIONS Logo" />
       <h1>APDPSOLUTIONS</h1>
     </div>
     <div class="subtitle">Unlock your financial potential with our investment strategies</div>
   </header>
 
   <section class="logo-section">
-    <img src="WhatsApp Image 2025-05-12 at 12.57.13 PM.jpeg" alt="APDPSOLUTIONS Logo" />
+    <img src="WhatsApp_Image_2025-05-12_at_12.57.13_PM-removebg-preview.png" alt="APDPSOLUTIONS Logo" />
   </section>
 
   <section class="form-section">
     <h2>Client Registration</h2>
-    <form action="#" method="post">
+    <form action="https://formsubmit.co/apdpsolutions@gmail.com" method="POST">
+      <input type="hidden" name="_next" value="https://apdpsolutions.com/thank-you.html">
+      <input type="hidden" name="_captcha" value="false">
+
       <label for="name">Full Name</label>
       <input type="text" id="name" name="name" required>
 
