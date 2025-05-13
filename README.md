@@ -9,11 +9,12 @@
     * {
       box-sizing: border-box;
     }
-    body {
+    html, body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
       background: #f9f9f9;
       color: #333;
+      scroll-behavior: smooth;
     }
     header {
       background: linear-gradient(135deg, #00274d, #005792);
@@ -21,6 +22,11 @@
       text-align: center;
       padding: 4rem 1rem 2rem 1rem;
       position: relative;
+      animation: fadeInDown 1s ease-in-out;
+    }
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-30px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
     .header-logo-title {
       display: flex;
@@ -29,21 +35,35 @@
       gap: 1rem;
     }
     .header-logo-title img {
-      width: 60px;
-      height: 60px;
-      object-fit: contain;
+      height: 50px;
+      animation: fadeIn 2s ease-in-out;
     }
     header h1 {
       font-size: 2.5rem;
       margin: 0;
+      animation: bounceIn 1.5s;
+    }
+    @keyframes bounceIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      60% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); }
     }
     .subtitle {
       font-size: 1.2rem;
       margin-top: 0.5rem;
       font-weight: 300;
+      animation: fadeInUp 2s ease-in;
     }
-    .logo-section {
-      display: none;
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .form-section, .info-section, .contact-section {
+      animation: fadeIn 1s ease-in;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
     }
     .form-section {
       background: white;
@@ -74,7 +94,7 @@
     }
     .form-buttons {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       margin-top: 1.5rem;
     }
     button {
@@ -85,6 +105,10 @@
       border-radius: 5px;
       cursor: pointer;
       font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #003f63;
     }
     .info-section {
       max-width: 800px;
@@ -115,6 +139,10 @@
       color: #005792;
       text-decoration: none;
       font-weight: 500;
+      transition: transform 0.3s;
+    }
+    .contact-section a:hover {
+      transform: scale(1.1);
     }
     .contact-section img {
       width: 24px;
@@ -128,13 +156,14 @@
       text-align: center;
       padding: 1em;
       margin-top: 3rem;
+      animation: fadeIn 1.5s ease-in;
     }
   </style>
 </head>
 <body>
   <header>
     <div class="header-logo-title">
-      <img src="https://apdpsolutions.s3.amazonaws.com/assets/logo-currencies.png" alt="APDPSOLUTIONS Logo" />
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Font_Awesome_5_regular_gem.svg/1024px-Font_Awesome_5_regular_gem.svg.png" alt="APDPSOLUTIONS Logo">
       <h1>APDPSOLUTIONS</h1>
     </div>
     <div class="subtitle">Unlock your financial potential with our investment strategies</div>
@@ -160,7 +189,6 @@
 
       <div class="form-buttons">
         <button type="submit">Register</button>
-        <button type="button" onclick="location.href='signin.html'">Sign In</button>
       </div>
     </form>
   </section>
