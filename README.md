@@ -29,8 +29,8 @@
       gap: 1rem;
     }
     .header-logo-title img {
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
       object-fit: contain;
     }
     header h1 {
@@ -43,11 +43,7 @@
       font-weight: 300;
     }
     .logo-section {
-      text-align: center;
-      margin: 2rem 0;
-    }
-    .logo-section img {
-      max-width: 150px;
+      display: none;
     }
     .form-section {
       background: white;
@@ -138,15 +134,11 @@
 <body>
   <header>
     <div class="header-logo-title">
-      <img src="WhatsApp_Image_2025-05-12_at_12.57.13_PM-removebg-preview.png" alt="APDPSOLUTIONS Logo" />
+      <img src="https://apdpsolutions.s3.amazonaws.com/assets/logo-currencies.png" alt="APDPSOLUTIONS Logo" />
       <h1>APDPSOLUTIONS</h1>
     </div>
     <div class="subtitle">Unlock your financial potential with our investment strategies</div>
   </header>
-
-  <section class="logo-section">
-    <img src="WhatsApp_Image_2025-05-12_at_12.57.13_PM-removebg-preview.png" alt="APDPSOLUTIONS Logo" />
-  </section>
 
   <section class="form-section">
     <h2>Client Registration</h2>
