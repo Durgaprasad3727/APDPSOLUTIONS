@@ -24,6 +24,13 @@
       position: relative;
       animation: slideInFromTop 1s ease-in-out;
     }
+    .utc-time {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 1rem;
+      color: #fff;
+    }
     @keyframes slideInFromTop {
       0% { transform: translateY(-100%); opacity: 0; }
       100% { transform: translateY(0); opacity: 1; }
@@ -103,6 +110,13 @@
     button:hover {
       transform: scale(1.05);
     }
+    .thank-you-message {
+      display: none;
+      text-align: center;
+      margin-top: 1rem;
+      color: green;
+      font-weight: bold;
+    }
     .info-section {
       max-width: 800px;
       margin: 2rem auto;
@@ -150,14 +164,6 @@
       color: #d32f2f;
       font-size: 1.2rem;
     }
-    .thank-you-message {
-      display: none;
-      text-align: center;
-      font-size: 1.2rem;
-      color: green;
-      margin-top: 20px;
-      font-weight: bold;
-    }
     footer {
       background: #00274d;
       color: white;
@@ -170,17 +176,16 @@
 </head>
 <body>
   <header>
+    <div class="utc-time" id="utcTime"></div>
     <h1>APDPSOLUTIONS</h1>
     <div class="subtitle">Unlock your financial potential with our investment strategies</div>
   </header>
 
-  <div class="launch-info" id="countdown-timer">
-    🚀 Our official website is launching soon — this is our prelaunch website!
-  </div>
+  <div class="launch-info">🚀 This is our prelaunch website. Official launch coming soon.</div>
 
   <section class="form-section">
     <h2>Client Registration</h2>
-    <form id="clientForm">
+    <form id="registrationForm">
       <label for="name">Full Name</label>
       <input type="text" id="name" name="name" required>
 
@@ -197,7 +202,7 @@
         <button type="submit">Register</button>
       </div>
     </form>
-    <div class="thank-you-message" id="thankYou">Thank you for registering! We'll be in touch soon.</div>
+    <div class="thank-you-message" id="thankYouMessage">Thank you for registering! We will contact you soon.</div>
   </section>
 
   <section class="info-section">
@@ -247,14 +252,34 @@
   </footer>
 
   <script>
-    const form = document.getElementById("clientForm");
-    const thankYou = document.getElementById("thankYou");
+    const form = document.getElementById("registrationForm");
+    const thankYou = document.getElementById("thankYouMessage");
 
-    form.addEventListener("submit", function(e) {
+    form.addEventListener("submit", function (e) {
       e.preventDefault();
-      thankYou.style.display = "block";
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const country = document.getElementById("country").value;
+      const mobile = document.getElementById("mobile").value;
+
+      fetch("https://formsubmit.co/ajax/apdpsolutions@gmail.com", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, country, mobile })
+      })
+      .then(res => res.ok ? thankYou.style.display = "block" : alert("Failed to send. Try again."))
+      .catch(() => alert("Something went wrong."));
+
       form.reset();
     });
+
+    function updateUTCTime() {
+      const now = new Date();
+      const utcTime = now.toUTCString().split(" ").slice(4, 5).join(" ");
+      document.getElementById("utcTime").textContent = "UTC Time: " + now.toUTCString().split(" ")[4];
+    }
+    setInterval(updateUTCTime, 1000);
+    updateUTCTime();
   </script>
 </body>
 </html>
