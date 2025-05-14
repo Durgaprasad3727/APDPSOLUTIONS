@@ -24,11 +24,11 @@
       position: relative;
       animation: slideInFromTop 1s ease-in-out;
     }
-    .utc-time {
+    #utc-time {
       position: absolute;
       top: 10px;
-      right: 20px;
-      font-size: 1rem;
+      right: 15px;
+      font-size: 0.9rem;
       color: #fff;
     }
     @keyframes slideInFromTop {
@@ -86,11 +86,16 @@
       margin-top: 1em;
       font-weight: 500;
     }
-    input {
+    input, select {
       padding: 0.7em;
       margin-top: 0.3em;
       border: 1px solid #ccc;
       border-radius: 8px;
+    }
+    .phone-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
     }
     .form-buttons {
       display: flex;
@@ -109,13 +114,6 @@
     }
     button:hover {
       transform: scale(1.05);
-    }
-    .thank-you-message {
-      display: none;
-      text-align: center;
-      margin-top: 1rem;
-      color: green;
-      font-weight: bold;
     }
     .info-section {
       max-width: 800px;
@@ -176,16 +174,21 @@
 </head>
 <body>
   <header>
-    <div class="utc-time" id="utcTime"></div>
+    <div id="utc-time"></div>
     <h1>APDPSOLUTIONS</h1>
     <div class="subtitle">Unlock your financial potential with our investment strategies</div>
   </header>
 
-  <div class="launch-info">🚀 This is our prelaunch website. Official launch coming soon.</div>
+  <div class="launch-info">
+    🚀 We will launch our official website soon — this is our prelaunch site.
+  </div>
 
   <section class="form-section">
     <h2>Client Registration</h2>
-    <form id="registrationForm">
+    <form action="https://formsubmit.co/apdpsolutions@gmail.com" method="POST">
+      <input type="hidden" name="_next" value="https://apdpsolutions.com/thank-you.html">
+      <input type="hidden" name="_captcha" value="false">
+
       <label for="name">Full Name</label>
       <input type="text" id="name" name="name" required>
 
@@ -196,13 +199,27 @@
       <input type="text" id="country" name="country" required>
 
       <label for="mobile">Mobile Number</label>
-      <input type="tel" id="mobile" name="mobile" required>
+      <div class="phone-group">
+        <select name="code" required>
+          <option value="+1">+1 (US)</option>
+          <option value="+91">+91 (IN)</option>
+          <option value="+44">+44 (UK)</option>
+          <option value="+61">+61 (AU)</option>
+          <option value="+971">+971 (UAE)</option>
+          <option value="+81">+81 (JP)</option>
+          <option value="+49">+49 (DE)</option>
+          <option value="+86">+86 (CN)</option>
+          <option value="+33">+33 (FR)</option>
+          <option value="+34">+34 (ES)</option>
+          <!-- Add more country codes as needed -->
+        </select>
+        <input type="tel" id="mobile" name="mobile" required>
+      </div>
 
       <div class="form-buttons">
         <button type="submit">Register</button>
       </div>
     </form>
-    <div class="thank-you-message" id="thankYouMessage">Thank you for registering! We will contact you soon.</div>
   </section>
 
   <section class="info-section">
@@ -252,31 +269,9 @@
   </footer>
 
   <script>
-    const form = document.getElementById("registrationForm");
-    const thankYou = document.getElementById("thankYouMessage");
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-      const country = document.getElementById("country").value;
-      const mobile = document.getElementById("mobile").value;
-
-      fetch("https://formsubmit.co/ajax/apdpsolutions@gmail.com", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, country, mobile })
-      })
-      .then(res => res.ok ? thankYou.style.display = "block" : alert("Failed to send. Try again."))
-      .catch(() => alert("Something went wrong."));
-
-      form.reset();
-    });
-
     function updateUTCTime() {
       const now = new Date();
-      const utcTime = now.toUTCString().split(" ").slice(4, 5).join(" ");
-      document.getElementById("utcTime").textContent = "UTC Time: " + now.toUTCString().split(" ")[4];
+      document.getElementById('utc-time').textContent = now.toUTCString();
     }
     setInterval(updateUTCTime, 1000);
     updateUTCTime();
