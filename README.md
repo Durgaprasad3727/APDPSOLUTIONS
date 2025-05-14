@@ -43,13 +43,6 @@
       font-weight: 300;
       animation: fadeInUp 2s ease-in;
     }
-    #utc-time {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      font-size: 1rem;
-      font-weight: 300;
-    }
     @keyframes fadeInUp {
       0% { opacity: 0; transform: translateY(30px); }
       100% { opacity: 1; transform: translateY(0); }
@@ -157,6 +150,14 @@
       color: #d32f2f;
       font-size: 1.2rem;
     }
+    .thank-you-message {
+      display: none;
+      text-align: center;
+      font-size: 1.2rem;
+      color: green;
+      margin-top: 20px;
+      font-weight: bold;
+    }
     footer {
       background: #00274d;
       color: white;
@@ -169,21 +170,17 @@
 </head>
 <body>
   <header>
-    <div id="utc-time"></div>
     <h1>APDPSOLUTIONS</h1>
     <div class="subtitle">Unlock your financial potential with our investment strategies</div>
   </header>
 
-  <div class="launch-info">
-    🚀 This is our prelaunch website. Official site launching soon.
+  <div class="launch-info" id="countdown-timer">
+    🚀 Our official website is launching soon — this is our prelaunch website!
   </div>
 
   <section class="form-section">
     <h2>Client Registration</h2>
-    <form action="https://formsubmit.co/apdpsolutions@gmail.com" method="POST">
-      <input type="hidden" name="_next" value="https://apdpsolutions.com/thank-you.html">
-      <input type="hidden" name="_captcha" value="false">
-
+    <form id="clientForm">
       <label for="name">Full Name</label>
       <input type="text" id="name" name="name" required>
 
@@ -200,6 +197,7 @@
         <button type="submit">Register</button>
       </div>
     </form>
+    <div class="thank-you-message" id="thankYou">Thank you for registering! We'll be in touch soon.</div>
   </section>
 
   <section class="info-section">
@@ -249,12 +247,14 @@
   </footer>
 
   <script>
-    function updateUTCTime() {
-      const now = new Date();
-      document.getElementById("utc-time").textContent = `UTC Time: ${now.toUTCString()}`;
-    }
-    setInterval(updateUTCTime, 1000);
-    updateUTCTime();
+    const form = document.getElementById("clientForm");
+    const thankYou = document.getElementById("thankYou");
+
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      thankYou.style.display = "block";
+      form.reset();
+    });
   </script>
 </body>
 </html>
