@@ -43,6 +43,13 @@
       font-weight: 300;
       animation: fadeInUp 2s ease-in;
     }
+    #utc-time {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 1rem;
+      font-weight: 300;
+    }
     @keyframes fadeInUp {
       0% { opacity: 0; transform: translateY(30px); }
       100% { opacity: 1; transform: translateY(0); }
@@ -62,11 +69,6 @@
       border-radius: 15px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
       transition: transform 0.3s;
-      animation: slideInUp 1.2s ease-in-out;
-    }
-    @keyframes slideInUp {
-      0% { transform: translateY(40px); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
     }
     .form-section:hover {
       transform: translateY(-5px);
@@ -130,7 +132,6 @@
       margin: 2rem auto;
       max-width: 800px;
       border-radius: 15px;
-      animation: fadeIn 2s ease-in-out;
     }
     .contact-section a {
       display: inline-block;
@@ -155,7 +156,6 @@
       font-weight: bold;
       color: #d32f2f;
       font-size: 1.2rem;
-      animation: fadeIn 2s ease-in-out;
     }
     footer {
       background: #00274d;
@@ -169,11 +169,14 @@
 </head>
 <body>
   <header>
+    <div id="utc-time"></div>
     <h1>APDPSOLUTIONS</h1>
     <div class="subtitle">Unlock your financial potential with our investment strategies</div>
   </header>
 
-  <div class="launch-info">🚀 We will launch our official website soon. This is our pre-launch version.</div>
+  <div class="launch-info">
+    🚀 This is our prelaunch website. Official site launching soon.
+  </div>
 
   <section class="form-section">
     <h2>Client Registration</h2>
@@ -244,5 +247,14 @@
   <footer>
     &copy; 2025 APDPSOLUTIONS. All Rights Reserved.
   </footer>
+
+  <script>
+    function updateUTCTime() {
+      const now = new Date();
+      document.getElementById("utc-time").textContent = `UTC Time: ${now.toUTCString()}`;
+    }
+    setInterval(updateUTCTime, 1000);
+    updateUTCTime();
+  </script>
 </body>
 </html>
