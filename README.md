@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>APDPSOLUTIONS - Unlock Your Financial Potential</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     /* General styles for the APDPSOLUTIONS website */
     * {
@@ -16,6 +17,7 @@
       background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
       color: #333;
       scroll-behavior: smooth;
+      overflow-x: hidden; /* Prevent horizontal scroll due to animations */
     }
     header {
       background: linear-gradient(135deg, #00274d, #005792);
@@ -24,6 +26,25 @@
       padding: 4rem 1rem 2rem 1rem;
       position: relative;
       animation: slideInFromTop 1s ease-in-out;
+      overflow: hidden; /* Hide overflow from 3D canvas */
+      min-height: 250px; /* Ensure header has enough height for canvas */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    #three-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0; /* Place behind text */
+      opacity: 0.3; /* Make it subtle */
+    }
+    header h1, .subtitle, .utc-time {
+      position: relative; /* Bring text above canvas */
+      z-index: 1;
     }
     .utc-time {
       position: absolute;
@@ -49,19 +70,43 @@
       font-size: 1.3rem;
       margin-top: 0.5rem;
       font-weight: 300;
-      animation: fadeInUp 2s ease-in;
+      /* Initial state for typing animation */
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+      border-right: .15em solid orange; /* The caret */
+      animation: typing 3s forwards, blink-caret .75s step-end infinite;
+      animation-delay: 1.5s; /* Delay after header animation */
     }
+
+    /* Typing animation */
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    /* Blinking caret animation */
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: white; }
+    }
+
     @keyframes fadeInUp {
       0% { opacity: 0; transform: translateY(30px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-    section {
-      animation: fadeIn 1s ease-in;
+
+    /* Scroll-triggered animation styles */
+    .animated-section {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
     }
-    @keyframes fadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
+    .animated-section.is-visible {
+      opacity: 1;
+      transform: translateY(0);
     }
+
     .form-section {
       background: white;
       max-width: 500px;
@@ -87,7 +132,7 @@
       margin-top: 1em;
       font-weight: 500;
     }
-    input {
+    input, select {
       padding: 0.7em;
       margin-top: 0.3em;
       border: 1px solid #ccc;
@@ -111,7 +156,7 @@
     button:hover {
       transform: scale(1.05);
     }
-    .thank-ou-message {
+    .thank-you-message {
       display: none;
       text-align: center;
       margin-top: 1rem;
@@ -147,10 +192,14 @@
       color: #005792;
       text-decoration: none;
       font-weight: 500;
-      transition: transform 0.3s;
+      transition: transform 0.3s, box-shadow 0.3s; /* Added box-shadow transition */
+      padding: 8px 12px; /* Added padding for better hover area */
+      border-radius: 8px; /* Rounded corners for hover effect */
     }
     .contact-section a:hover {
       transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Added shadow on hover */
+      background-color: rgba(0, 87, 146, 0.1); /* Subtle background on hover */
     }
     .contact-section img {
       width: 24px;
@@ -174,17 +223,17 @@
       animation: fadeIn 1.5s ease-in;
     }
 
-    /* Styles for Investment Plans Section (copied from previous code) */
+    /* Styles for Investment Plans Section */
     section#investment-plans {
       padding: 40px 20px;
       max-width: 900px;
       width: 100%;
-      margin: 2rem auto; /* Added margin to fit into the main layout */
-      background: #fff; /* Added background for consistency */
-      border-radius: 15px; /* Added border-radius for consistency */
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05); /* Added box-shadow for consistency */
+      margin: 2rem auto;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
-    section#investment-plans h2 { /* Targeting h2 specifically within this section */
+    section#investment-plans h2 {
       text-align: center;
       font-size: 2.8rem;
       font-weight: 700;
@@ -192,10 +241,6 @@
       margin-bottom: 40px;
       letter-spacing: 1.2px;
       animation: fadeInDown 1s ease forwards;
-    }
-    @keyframes fadeInDown {
-      0% { opacity: 0; transform: translateY(-25px); }
-      100% { opacity: 1; transform: translateY(0); }
     }
     ul.scheme-list {
       list-style: none;
@@ -228,43 +273,21 @@
       outline: none;
       border-color: #00509e;
     }
-    ul.scheme-list li.scheme-item[data-plan="weekly"] {
-      background: #b87333; /* bronze */
-    }
-    ul.scheme-list li.scheme-item[data-plan="monthly"] {
-      background: #c0c0c0; /* silver */
-      color: #003366;
-      box-shadow: 0 6px 12px rgba(192,192,192,0.5);
-    }
-    ul.scheme-list li.scheme-item[data-plan="quarterly"] {
-      background: #ffd700; /* gold */
-      color: #003366;
-      box-shadow: 0 6px 12px rgba(255,215,0,0.4);
-    }
-    ul.scheme-list li.scheme-item[data-plan="halfyearly"] {
-      background: #daa520; /* goldenrod */
-    }
-    ul.scheme-list li.scheme-item[data-plan="yearly"] {
-      background: #b9f2ff; /* light cyan */
-      color: #003366;
-      box-shadow: 0 6px 12px rgba(185,242,255,0.4);
-    }
-    ul.scheme-list li.scheme-item[data-plan="twoyears"] {
-      background: #0077be; /* blue */
-    }
-    ul.scheme-list li.scheme-item[data-plan="threeyears"] {
-      background: #4b0082; /* indigo */
-    }
-    ul.scheme-list li.scheme-item[data-plan="fiveyears"] {
-      background: #6a5acd; /* slate blue */
-    }
+    ul.scheme-list li.scheme-item[data-plan="weekly"] { background: #b87333; }
+    ul.scheme-list li.scheme-item[data-plan="monthly"] { background: #c0c0c0; color: #003366; box-shadow: 0 6px 12px rgba(192,192,192,0.5); }
+    ul.scheme-list li.scheme-item[data-plan="quarterly"] { background: #ffd700; color: #003366; box-shadow: 0 6px 12px rgba(255,215,0,0.4); }
+    ul.scheme-list li.scheme-item[data-plan="halfyearly"] { background: #daa520; }
+    ul.scheme-list li.scheme-item[data-plan="yearly"] { background: #b9f2ff; color: #003366; box-shadow: 0 6px 12px rgba(185,242,255,0.4); }
+    ul.scheme-list li.scheme-item[data-plan="twoyears"] { background: #0077be; }
+    ul.scheme-list li.scheme-item[data-plan="threeyears"] { background: #4b0082; }
+    ul.scheme-list li.scheme-item[data-plan="fiveyears"] { background: #6a5acd; }
 
     .scheme-item .icon {
       font-size: 1.4rem;
       user-select: none;
     }
 
-    /* Modal styles for Investment Plans (copied from previous code) */
+    /* Modal styles for Investment Plans */
     #modal-overlay {
       position: fixed;
       inset: 0;
@@ -339,7 +362,7 @@
       outline: none;
     }
 
-    /* Responsive adjustments for both sections */
+    /* Responsive adjustments for all sections */
     @media (max-width: 600px) {
       ul.scheme-list {
         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -361,32 +384,67 @@
         top: 12px;
         right: 12px;
       }
+      header {
+        padding: 3rem 1rem 1.5rem 1rem;
+      }
+      header h1 {
+        font-size: 2.2rem;
+      }
+      .subtitle {
+        font-size: 1rem;
+      }
     }
 
-    /* Styles for the logo (if present) */
-    .header-logo {
-      width: 150px; /* Adjust size as needed */
-      height: auto;
-      margin-bottom: 1rem; /* Space between logo and title */
-      animation: fadeIn 1.5s ease-in; /* Add fade-in animation */
+    /* Styles for mobile number and country code */
+    .mobile-input-group {
+      display: flex;
+      gap: 10px; /* Space between select and input */
+      margin-top: 0.3em;
     }
-    @media (max-width: 600px) {
-      .header-logo {
-        width: 100px; /* Smaller logo on mobile */
-      }
+    .mobile-input-group select {
+      flex-shrink: 0; /* Prevent select from shrinking */
+      width: auto; /* Allow select to size based on content */
+    }
+    .mobile-input-group input {
+      flex-grow: 1; /* Allow input to take remaining space */
+    }
+
+    /* Back to Top Button */
+    #backToTopBtn {
+      display: none; /* Hidden by default */
+      position: fixed; /* Fixed position */
+      bottom: 20px; /* Place at the bottom */
+      right: 30px; /* Place at the right */
+      z-index: 99; /* Ensure it's above other content */
+      border: none; /* Remove borders */
+      outline: none; /* Remove outline */
+      background-color: #005792; /* Background color */
+      color: white; /* Text color */
+      cursor: pointer; /* Add a mouse pointer on hover */
+      padding: 15px; /* Some padding */
+      border-radius: 10px; /* Rounded corners */
+      font-size: 18px; /* Increase font size */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    #backToTopBtn:hover {
+      background-color: #003366; /* Darker background on hover */
+      transform: translateY(-3px); /* Slight lift on hover */
     }
   </style>
 </head>
 <body>
   <header>
+    <canvas id="three-canvas"></canvas>
     <div class="utc-time" id="utcTime"></div>
     <h1>APDPSOLUTIONS</h1>
-    <div class="subtitle">Unlock your financial potential with our investment strategies</div>
+    <div class="subtitle" id="header-subtitle">Unlock your financial potential with our investment strategies</div>
   </header>
 
   <div class="launch-info">🚀 This is our prelaunch website. Official launch coming soon.</div>
 
-  <section class="form-section">
+  <section class="form-section animated-section">
     <h2>Client Registration</h2>
     <form id="registrationForm">
       <label for="name">Full Name</label>
@@ -399,7 +457,22 @@
       <input type="text" id="country" name="country" required>
 
       <label for="mobile">Mobile Number</label>
-      <input type="tel" id="mobile" name="mobile" required>
+      <div class="mobile-input-group">
+        <select id="countryCode" name="countryCode">
+          <option value="+1">+1 (USA/Canada)</option>
+          <option value="+44">+44 (UK)</option>
+          <option value="+91" selected>+91 (India)</option>
+          <option value="+61">+61 (Australia)</option>
+          <option value="+49">+49 (Germany)</option>
+          <option value="+33">+33 (France)</option>
+          <option value="+81">+81 (Japan)</option>
+          <option value="+86">+86 (China)</option>
+          <option value="+971">+971 (UAE)</option>
+          <option value="+65">+65 (Singapore)</option>
+          <option value="+27">+27 (South Africa)</option>
+          </select>
+        <input type="tel" id="mobile" name="mobile" required>
+      </div>
 
       <div class="form-buttons">
         <button type="submit">Register</button>
@@ -408,33 +481,7 @@
     <div class="thank-you-message" id="thankYouMessage">Thank you for registering! We will contact you soon.</div>
   </section>
 
-  <section class="info-section">
-    <h2>Your Data is Safe</h2>
-    <p>At APDPSOLUTIONS, we take your privacy and data security seriously. All client information is encrypted and stored securely. We never share your personal data with third parties without your consent.</p>
-  </section>
-
-  <section class="info-section">
-    <h2>About Us</h2>
-    <p>APDPSOLUTIONS is a forward-thinking investment platform created to empower clients with the tools and opportunities to grow their wealth. Our platform combines secure technology, expert insight, and transparent practices to create a trusted investment environment. We are committed to helping you achieve your financial goals through strategic fundraising and personalized client service.</p>
-  </section>
-
-  <section class="info-section">
-    <h2>Why Fund Us?</h2>
-    <p>
-      - We offer a unique approach to secure, blockchain-based fundraising.<br />
-      - Transparent and fast USDT (TRC20) crypto payments.<br />
-      - Dedicated support and regular updates for investors.<br />
-      - We align our success with yours — we grow together.<br />
-      - Advanced tools to monitor and manage your investments in real-time.<br />
-      - Security of capital is our top priority.<br />
-      - Enjoy consistent returns and growth.<br />
-      - Backed by strong past performance metrics.<br />
-      - Read real user testimonials from our satisfied investors.<br />
-      - Unlock passive income potential through our optimized strategies.
-    </p>
-  </section>
-
-  <section id="investment-plans" aria-label="Investment Plans">
+  <section id="investment-plans" aria-label="Investment Plans" class="animated-section">
     <h2>Investment Plans</h2>
 
     <ul class="scheme-list" role="listbox" tabindex="0" aria-label="Investment scheme list">
@@ -513,6 +560,32 @@
     </ul>
   </section>
 
+  <section class="info-section animated-section">
+    <h2>Your Data is Safe</h2>
+    <p>At APDPSOLUTIONS, we take your privacy and data security seriously. All client information is encrypted and stored securely. We never share your personal data with third parties without your consent.</p>
+  </section>
+
+  <section class="info-section animated-section">
+    <h2>About Us</h2>
+    <p>APDPSOLUTIONS is a forward-thinking investment platform created to empower clients with the tools and opportunities to grow their wealth. Our platform combines secure technology, expert insight, and transparent practices to create a trusted investment environment. We are committed to helping you achieve your financial goals through strategic fundraising and personalized client service.</p>
+  </section>
+
+  <section class="info-section animated-section">
+    <h2>Why Fund Us?</h2>
+    <p>
+      - We offer a unique approach to secure, blockchain-based fundraising.<br />
+      - Transparent and fast USDT (TRC20) crypto payments.<br />
+      - Dedicated support and regular updates for investors.<br />
+      - We align our success with yours — we grow together.<br />
+      - Advanced tools to monitor and manage your investments in real-time.<br />
+      - Security of capital is our top priority.<br />
+      - Enjoy consistent returns and growth.<br />
+      - Backed by strong past performance metrics.<br />
+      - Read real user testimonials from our satisfied investors.<br />
+      - Unlock passive income potential through our optimized strategies.
+    </p>
+  </section>
+
   <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
     <div id="plan-details">
       <button id="close-btn" aria-label="Close details modal">×</button>
@@ -521,7 +594,7 @@
     </div>
   </div>
 
-  <section class="contact-section">
+  <section class="contact-section animated-section">
     <h2>Contact With Us</h2>
     <a href="https://www.instagram.com/apdpsolutions/" target="_blank">
       <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" />Instagram
@@ -529,7 +602,7 @@
     <a href="https://t.me/apdpsolutions" target="_blank">
       <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram" />Telegram
     </a>
-    <a href="mailto:apdpsolutions@gmail.com">
+    <a href="#" id="emailLink">
       <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Email" />Email
     </a>
     <a href="https://www.youtube.com/@apdpsolutions-n6g" target="_blank">
@@ -541,6 +614,11 @@
     © 2025 APDPSOLUTIONS. All Rights Reserved.
   </footer>
 
+  <button onclick="topFunction()" id="backToTopBtn" title="Go to top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     // Existing script for form submission and UTC time
     const form = document.getElementById("registrationForm");
@@ -551,12 +629,15 @@
       const name = document.getElementById("name").value;
       const email = document.getElementById("email").value;
       const country = document.getElementById("country").value;
+      const countryCode = document.getElementById("countryCode").value;
       const mobile = document.getElementById("mobile").value;
+
+      const fullMobile = countryCode + mobile;
 
       fetch("https://formsubmit.co/ajax/apdpsolutions@gmail.com", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, country, mobile })
+        body: JSON.stringify({ name, email, country, mobile: fullMobile })
       })
       .then(res => res.ok ? thankYou.style.display = "block" : console.error("Failed to send. Try again."))
       .catch((error) => console.error("Something went wrong:", error));
@@ -751,6 +832,154 @@
         hideModal();
       }
     });
+
+    // --- Three.js 3D Animation for Header ---
+    let scene, camera, renderer, sphere;
+
+    function initThreeJS() {
+      const canvas = document.getElementById('three-canvas');
+      if (!canvas) {
+        console.error("Three.js canvas not found!");
+        return;
+      }
+
+      // Scene setup
+      scene = new THREE.Scene();
+
+      // Camera setup
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / canvas.clientHeight, 0.1, 1000);
+      camera.position.z = 2;
+
+      // Renderer setup
+      renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true }); // alpha: true for transparent background
+      renderer.setSize(window.innerWidth, canvas.clientHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+
+      // Create a network sphere (abstract blockchain/data representation)
+      const geometry = new THREE.IcosahedronGeometry(1, 1); // Radius 1, detail 1
+      const material = new THREE.LineBasicMaterial({ color: 0x88ccff, transparent: true, opacity: 0.7 }); // Light blue lines
+      const edges = new THREE.EdgesGeometry(geometry);
+      sphere = new THREE.LineSegments(edges, material);
+      scene.add(sphere);
+
+      // Add some subtle points for a 'star' effect
+      const pointsMaterial = new THREE.PointsMaterial({
+        color: 0xb9f2ff, // Light cyan points
+        size: 0.05,
+        transparent: true,
+        opacity: 0.8
+      });
+      const points = new THREE.Points(geometry, pointsMaterial);
+      scene.add(points);
+
+      // Animation loop
+      const animateThreeJS = () => {
+        requestAnimationFrame(animateThreeJS);
+
+        // Rotate the sphere and points
+        if (sphere) {
+          sphere.rotation.x += 0.0005;
+          sphere.rotation.y += 0.001;
+        }
+        if (points) {
+          points.rotation.x += 0.0005;
+          points.rotation.y += 0.001;
+        }
+
+        renderer.render(scene, camera);
+      };
+
+      animateThreeJS();
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        const newWidth = window.innerWidth;
+        const newHeight = canvas.clientHeight; // Keep height based on CSS
+        camera.aspect = newWidth / newHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(newWidth, newHeight);
+      });
+    }
+
+    // --- Scroll-triggered Animations ---
+    const animatedSections = document.querySelectorAll('.animated-section');
+
+    const observerOptions = {
+      root: null, /* viewport */
+      rootMargin: '0px',
+      threshold: 0.2 /* 20% of element visible to trigger */
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target); // Stop observing once animated
+        }
+      });
+    }, observerOptions);
+
+    // Observe each section
+    animatedSections.forEach(section => {
+      observer.observe(section);
+    });
+
+    // --- Back to Top Button Logic ---
+    const backToTopBtn = document.getElementById("backToTopBtn");
+
+    // When the user scrolls down 20px from the top of the document, show the button
+    window.onscroll = function() { scrollFunction() };
+
+    function scrollFunction() {
+      if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+        backToTopBtn.style.display = "block";
+      } else {
+        backToTopBtn.style.display = "none";
+      }
+    }
+
+    // When the user clicks on the button, scroll to the top of the document
+    function topFunction() {
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    }
+
+    // --- Copy Email to Clipboard ---
+    const emailLink = document.getElementById('emailLink');
+    if (emailLink) {
+      emailLink.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent default mailto: action
+        const emailAddress = "apdpsolutions@gmail.com"; // Your email address
+        
+        // Use document.execCommand for broader compatibility in iframes
+        const tempInput = document.createElement('input');
+        tempInput.value = emailAddress;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+
+        // Provide visual feedback
+        const originalText = emailLink.innerHTML;
+        emailLink.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => {
+          emailLink.innerHTML = originalText;
+        }, 2000);
+      });
+    }
+
+    // Initialize Three.js and other functions when the window loads
+    window.onload = function() {
+      initThreeJS();
+      updateUTCTime();
+      // Start typing animation after a slight delay to ensure CSS is loaded
+      const subtitleElement = document.getElementById('header-subtitle');
+      if (subtitleElement) {
+        subtitleElement.style.width = '0'; /* Reset width to start animation */
+        subtitleElement.style.animation = 'typing 3s forwards, blink-caret .75s step-end infinite';
+        subtitleElement.style.animationDelay = '1.5s';
+      }
+    };
   </script>
 </body>
 </html>
