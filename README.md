@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -40,7 +40,7 @@
       width: 100%;
       height: 100%;
       z-index: 0; /* Place behind text */
-      opacity: 0.3; /* Make it subtle */
+      opacity: 0.3; /* Make it subtle initially */
     }
     header h1, .subtitle, .utc-time {
       position: relative; /* Bring text above canvas */
@@ -142,6 +142,7 @@
       display: flex;
       justify-content: center;
       margin-top: 1.5rem;
+      position: relative; /* For loading spinner positioning */
     }
     button {
       padding: 0.7em 1.2em;
@@ -213,7 +214,15 @@
       font-weight: bold;
       color: #d32f2f;
       font-size: 1.2rem;
+      animation: pulse 2s infinite; /* Pulsing animation */
     }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.03); opacity: 0.9; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
     footer {
       background: #00274d;
       color: white;
@@ -257,7 +266,7 @@
       font-weight: 700;
       cursor: pointer;
       box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease; /* Added background transition */
       user-select: none;
       display: flex;
       align-items: center;
@@ -272,7 +281,16 @@
       box-shadow: 0 10px 20px rgba(0,0,0,0.25);
       outline: none;
       border-color: #00509e;
+      background: linear-gradient(to right, #00b4db, #0083b0); /* Highlight on hover */
+      color: white; /* Ensure text color remains readable */
     }
+    /* Specific hover colors for different schemes */
+    ul.scheme-list li.scheme-item[data-plan="monthly"]:hover,
+    ul.scheme-list li.scheme-item[data-plan="quarterly"]:hover,
+    ul.scheme-list li.scheme-item[data-plan="yearly"]:hover {
+      color: white; /* Change text to white on hover for light schemes */
+    }
+
     ul.scheme-list li.scheme-item[data-plan="weekly"] { background: #b87333; }
     ul.scheme-list li.scheme-item[data-plan="monthly"] { background: #c0c0c0; color: #003366; box-shadow: 0 6px 12px rgba(192,192,192,0.5); }
     ul.scheme-list li.scheme-item[data-plan="quarterly"] { background: #ffd700; color: #003366; box-shadow: 0 6px 12px rgba(255,215,0,0.4); }
@@ -432,6 +450,67 @@
       background-color: #003366; /* Darker background on hover */
       transform: translateY(-3px); /* Slight lift on hover */
     }
+
+    /* Form Submission Message Box */
+    #formMessageBox {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+      padding: 25px 35px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      z-index: 1000;
+      text-align: center;
+      font-weight: bold;
+      animation: fadeInScale 0.3s ease-out;
+    }
+    #formMessageBox.success {
+      color: #28a745;
+    }
+    #formMessageBox.error {
+      color: #dc3545;
+    }
+    #formMessageBox button {
+      margin-top: 15px;
+      padding: 8px 20px;
+      background-color: #005792;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: normal;
+    }
+    #formMessageBox button:hover {
+      background-color: #003366;
+    }
+
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: none; /* Hidden by default */
+      position: absolute;
+      right: 15px; /* Adjust position relative to button */
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -475,7 +554,8 @@
       </div>
 
       <div class="form-buttons">
-        <button type="submit">Register</button>
+        <button type="submit" id="submitButton">Register</button>
+        <div class="spinner" id="formSpinner"></div>
       </div>
     </form>
     <div class="thank-you-message" id="thankYouMessage">Thank you for registering! We will contact you soon.</div>
@@ -618,14 +698,48 @@
     <i class="fas fa-arrow-up"></i>
   </button>
 
+  <div id="formMessageBox">
+    <p id="messageText"></p>
+    <button onclick="hideMessageBox()">OK</button>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
+    // Global variables for message box
+    const formMessageBox = document.getElementById('formMessageBox');
+    const messageText = document.getElementById('messageText');
+
+    /**
+     * Displays a message box with a given message and type (success/error).
+     * @param {string} message - The message to display.
+     * @param {string} type - 'success' or 'error'.
+     */
+    function showMessageBox(message, type) {
+      messageText.textContent = message;
+      formMessageBox.className = ''; // Clear existing classes
+      formMessageBox.classList.add(type);
+      formMessageBox.style.display = 'block';
+    }
+
+    /**
+     * Hides the message box.
+     */
+    function hideMessageBox() {
+      formMessageBox.style.display = 'none';
+    }
+
     // Existing script for form submission and UTC time
     const form = document.getElementById("registrationForm");
-    const thankYou = document.getElementById("thankYouMessage");
+    const submitButton = document.querySelector("#registrationForm button[type='submit']");
+    const formSpinner = document.getElementById("formSpinner");
 
-    form.addEventListener("submit", function (e) {
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
+
+      // Show spinner and disable button
+      submitButton.disabled = true;
+      formSpinner.style.display = 'block';
+
       const name = document.getElementById("name").value;
       const email = document.getElementById("email").value;
       const country = document.getElementById("country").value;
@@ -634,15 +748,28 @@
 
       const fullMobile = countryCode + mobile;
 
-      fetch("https://formsubmit.co/ajax/apdpsolutions@gmail.com", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, country, mobile: fullMobile })
-      })
-      .then(res => res.ok ? thankYou.style.display = "block" : console.error("Failed to send. Try again."))
-      .catch((error) => console.error("Something went wrong:", error));
+      try {
+        const response = await fetch("https://formsubmit.co/ajax/apdpsolutions@gmail.com", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, country, mobile: fullMobile })
+        });
 
-      form.reset();
+        if (response.ok) {
+          showMessageBox("Thank you for registering! We will contact you soon.", "success");
+          form.reset();
+        } else {
+          showMessageBox("Failed to send your registration. Please try again.", "error");
+          console.error("Form submission failed:", response.statusText);
+        }
+      } catch (error) {
+        showMessageBox("An error occurred during submission. Please check your internet connection.", "error");
+        console.error("Something went wrong:", error);
+      } finally {
+        // Hide spinner and enable button
+        submitButton.disabled = false;
+        formSpinner.style.display = 'none';
+      }
     });
 
     function updateUTCTime() {
@@ -834,7 +961,14 @@
     });
 
     // --- Three.js 3D Animation for Header ---
-    let scene, camera, renderer, sphere;
+    let scene, camera, renderer, sphere, points; // Declare points globally too
+
+    // Variables for blinking effect
+    let blinkOpacity = 0.3; // Starting opacity
+    let blinkDirection = 1; // 1 for increasing, -1 for decreasing
+    const blinkSpeed = 0.005; // How fast it blinks
+    const minOpacity = 0.1;
+    const maxOpacity = 0.5;
 
     function initThreeJS() {
       const canvas = document.getElementById('three-canvas');
@@ -857,7 +991,7 @@
 
       // Create a network sphere (abstract blockchain/data representation)
       const geometry = new THREE.IcosahedronGeometry(1, 1); // Radius 1, detail 1
-      const material = new THREE.LineBasicMaterial({ color: 0x88ccff, transparent: true, opacity: 0.7 }); // Light blue lines
+      const material = new THREE.LineBasicMaterial({ color: 0x88ccff, transparent: true, opacity: blinkOpacity }); // Light blue lines
       const edges = new THREE.EdgesGeometry(geometry);
       sphere = new THREE.LineSegments(edges, material);
       scene.add(sphere);
@@ -867,14 +1001,29 @@
         color: 0xb9f2ff, // Light cyan points
         size: 0.05,
         transparent: true,
-        opacity: 0.8
+        opacity: blinkOpacity
       });
-      const points = new THREE.Points(geometry, pointsMaterial);
+      points = new THREE.Points(geometry, pointsMaterial);
       scene.add(points);
 
       // Animation loop
       const animateThreeJS = () => {
         requestAnimationFrame(animateThreeJS);
+
+        // Update blinking opacity
+        blinkOpacity += blinkDirection * blinkSpeed;
+        if (blinkOpacity > maxOpacity || blinkOpacity < minOpacity) {
+          blinkDirection *= -1; // Reverse direction
+          blinkOpacity = Math.max(minOpacity, Math.min(maxOpacity, blinkOpacity)); // Clamp value
+        }
+
+        // Apply blinking opacity to sphere and points
+        if (sphere && sphere.material) {
+          sphere.material.opacity = blinkOpacity;
+        }
+        if (points && points.material) {
+          points.material.opacity = blinkOpacity;
+        }
 
         // Rotate the sphere and points
         if (sphere) {
@@ -927,7 +1076,7 @@
     // --- Back to Top Button Logic ---
     const backToTopBtn = document.getElementById("backToTopBtn");
 
-    // When the user scrolls down 20px from the top of the document, show the button
+    // When the user scrolls down 200px from the top of the document, show the button
     window.onscroll = function() { scrollFunction() };
 
     function scrollFunction() {
