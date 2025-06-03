@@ -363,7 +363,7 @@
       }
     }
 
-    /* Styles for the logo */
+    /* Styles for the logo (if present) */
     .header-logo {
       width: 150px; /* Adjust size as needed */
       height: auto;
@@ -380,7 +380,6 @@
 <body>
   <header>
     <div class="utc-time" id="utcTime"></div>
-    <img src="logo.png" alt="APDPSOLUTIONS Logo" class="header-logo">
     <h1>APDPSOLUTIONS</h1>
     <div class="subtitle">Unlock your financial potential with our investment strategies</div>
   </header>
@@ -482,7 +481,7 @@
         tabindex="-1" 
         aria-selected="false"
       >
-        <span class="icon" aria-hidden="true">🎯</span> YEARLY – 12 MONTHS (PLATINUM)
+        <span class="icon" aria-hidden="true">🎯</span> YEARLY – 12 MONTHS (DIAMOND)
       </li>
       <li 
         class="scheme-item" 
@@ -491,7 +490,7 @@
         tabindex="-1" 
         aria-selected="false"
       >
-        <span class="icon" aria-hidden="true">🏆</span> TWO YEARS (DIAMOND)
+        <span class="icon" aria-hidden="true">🏆</span> TWO YEARS (DIAMOND PLUS)
       </li>
       <li 
         class="scheme-item" 
@@ -500,7 +499,7 @@
         tabindex="-1" 
         aria-selected="false"
       >
-        <span class="icon" aria-hidden="true">🚀</span> THREE YEARS (ELITE)
+        <span class="icon" aria-hidden="true">🚀</span> THREE YEARS (PLATINUM)
       </li>
       <li 
         class="scheme-item" 
@@ -509,7 +508,7 @@
         tabindex="-1" 
         aria-selected="false"
       >
-        <span class="icon" aria-hidden="true">🌟</span> FIVE YEARS (LEGEND)
+        <span class="icon" aria-hidden="true">🌟</span> FIVE YEARS (PLATINUM PLUS)
       </li>
     </ul>
   </section>
@@ -577,73 +576,88 @@
       weekly: {
         title: "WEEKLY – 7 DAYS (BRONZE)",
         description: [
-          "Minimum investment: $100",
-          "Return: 10% weekly",
-          "Duration: 7 days",
-          "Ideal for short-term investors."
+          "For first 100 clients only applicable.",
+          "Minimum investment: $100 to $10,000.",
+          "Return: 2% for the week only.",
+          "A client can invest only 3 times in the weekly plan, then they have to upgrade for the next basic-monthly, quarterly, half yearly etc., plans.",
+          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
+          "Example: A client invested $1000 on (10-02-2020) in weekly plan. After 7 days on (16-02-2020), they got invested profit of $20 for a week, and total amount of $1,020 can withdraw on the next day after plan expire (17-02-2020)."
         ]
       },
       monthly: {
         title: "MONTHLY – 30 DAYS (SILVER)",
         description: [
-          "Minimum investment: $500",
-          "Return: 15% monthly",
-          "Duration: 30 days",
-          "Great balance of risk and reward."
+          "Minimum investment: $500 to $100,000.",
+          "Return: 4% for the month only.",
+          "A client can invest only 2 times in the Monthly plan, then they have to upgrade for the next quarterly, half yearly etc., plans.",
+          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
+          "Example: A client invested $10,000 on (1-03-2020) in monthly plan. After a month on (30-03-2020), they got invested profit of $400 for a month, and total amount of $10,400 can withdraw on the next day after plan expire (31-03-2020).",
+          "Client will get bonus of $5 for the upgradation of the silver plan."
         ]
       },
       quarterly: {
         title: "QUARTERLY – 3 MONTHS (GOLD)",
         description: [
-          "Minimum investment: $1500",
-          "Return: 20% quarterly",
-          "Duration: 3 months",
-          "For steady medium-term growth."
+          "Minimum investment: $500 to $1,000,000.",
+          "Return: 4.15% for the QUARTERLY (3 MONTHS) only.",
+          "A client can invest only 3 times in the QUARTERLY plan, then they have to upgrade for the next half yearly, annual etc., plans.",
+          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
+          "Example: A client invested $100,000 on (1-04-2020) in quarterly plan. After 3 months on (1-07-2020), they got invested profit of $12,450 for 3 months, and total amount of $112,450 can withdraw on the next day after plan expire (2-07-2020).",
+          "Client will get bonus of $10 for the upgradation of the gold plan."
         ]
       },
       halfyearly: {
         title: "HALF YEARLY – 6 MONTHS (GOLD PLUS)",
         description: [
-          "Minimum investment: $3000",
-          "Return: 25% half-yearly",
-          "Duration: 6 months",
-          "Higher returns with moderate lock-in."
+          "Minimum investment: $1,000 to $1,000,000.",
+          "Return: 4.25% for the HALF YEARLY (6 MONTHS) only.",
+          "They can upgrade for the next- one year, 2 years, 3 years, 5 years etc., plans.",
+          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
+          "Example: A client invested $100,000 on (1-04-2020) in half yearly plan. After 6 months on (1-10-2020), they got invested profit of $25,500 for 6 months, and total amount of $125,500 can withdraw on the next day after plan expire (2-10-2020).",
+          "Client will get bonus of $20 for the upgradation of the gold plus plan."
         ]
       },
       yearly: {
-        title: "YEARLY – 12 MONTHS (PLATINUM)",
+        title: "YEARLY – 12 MONTHS (DIAMOND)",
         description: [
-          "Minimum investment: $5000",
-          "Return: 30% yearly",
-          "Duration: 12 months",
-          "Best for long-term investors."
+          "Minimum investment: $1,000 to $10,000,000.",
+          "Return: 4.35% for the YEARLY (12 MONTHS) only.",
+          "They can upgrade for the next- 2 years, 3 years, 5 years etc., plans.",
+          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
+          "Example: A client invested $100,000 on (1-04-2020) in yearly plan. After one year on (1-04-2021), they got invested profit of $52,200 for 12 months, and total amount of $152,200 can withdraw on the next day after plan expire (2-04-2021).",
+          "Client will get bonus of $20 for the upgradation of the diamond plan."
         ]
       },
       twoyears: {
-        title: "TWO YEARS (DIAMOND)",
+        title: "TWO YEARS – 24 MONTHS (DIAMOND PLUS)",
         description: [
-          "Minimum investment: $10000",
-          "Return: 40% over 2 years",
-          "Duration: 24 months",
-          "Exclusive high-return plan."
+          "Minimum investment: $1,000 to $10,000,000.",
+          "Return: 4.45% for the 2 YEARS (24 MONTHS) only.",
+          "They can upgrade for the next- 3 years, 5 years etc., plans.",
+          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
+          "Example: A client invested $100,000 on (1-04-2020) in 2 years plan. After 2 years on (1-04-2022), they got invested profit of $106,800 for 24 months, and total amount of $206,800 can withdraw on the next day after plan expire (2-04-2022).",
+          "Client will get bonus of $40 for the upgradation of the diamond plus plan."
         ]
       },
       threeyears: {
-        title: "THREE YEARS (ELITE)",
+        title: "THREE YEARS – 36 MONTHS (PLATINUM)",
         description: [
-          "Minimum investment: $20000",
-          "Return: 60% over 3 years",
-          "Duration: 36 months",
-          "Premium plan for significant growth."
+          "Minimum investment: $1,000 to $10,000,000.",
+          "Return: 4.50% for the 3 YEARS (36 MONTHS) only.",
+          "They can upgrade for the next- 5 years plan.",
+          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
+          "Example: A client invested $100,000 on (1-04-2020) in 3 years plan. After 3 years on (1-04-2023), they got invested profit of $162,000 for 36 months, and total amount of $262,000 can withdraw on the next day after plan expire (2-04-2023).",
+          "Client will get bonus of $60 for the upgradation of the PLATINUM plan."
         ]
       },
       fiveyears: {
-        title: "FIVE YEARS (LEGEND)",
+        title: "FIVE YEARS – 60 MONTHS (PLATINUM PLUS)",
         description: [
-          "Minimum investment: $50000",
-          "Return: 100% over 5 years",
-          "Duration: 60 months",
-          "Ultimate long-term wealth creation."
+          "Minimum investment: $1,000 to $10,000,000.",
+          "Return: 5% for the 5 YEARS (60 MONTHS) only.",
+          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
+          "Example: A client invested $100,000 on (1-04-2020) in 5 years plan. After 5 years on (1-04-2025), they got invested profit of $300,000 for 60 months, and total amount of $400,000 can withdraw on the next day after plan expire (2-04-2025).",
+          "Client will get bonus of $100 for the upgradation of the PLATINUM PLUS plan."
         ]
       }
     };
