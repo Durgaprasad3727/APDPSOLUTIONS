@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -6,6 +6,7 @@
   <title>APDPSOLUTIONS - Unlock Your Financial Potential</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
   <style>
+    /* General styles for the APDPSOLUTIONS website */
     * {
       box-sizing: border-box;
     }
@@ -24,11 +25,11 @@
       position: relative;
       animation: slideInFromTop 1s ease-in-out;
     }
-    #utc-time {
+    .utc-time {
       position: absolute;
       top: 10px;
-      right: 15px;
-      font-size: 0.9rem;
+      right: 20px;
+      font-size: 1rem;
       color: #fff;
     }
     @keyframes slideInFromTop {
@@ -86,16 +87,11 @@
       margin-top: 1em;
       font-weight: 500;
     }
-    input, select {
+    input {
       padding: 0.7em;
       margin-top: 0.3em;
       border: 1px solid #ccc;
       border-radius: 8px;
-    }
-    .phone-group {
-      display: flex;
-      gap: 10px;
-      align-items: center;
     }
     .form-buttons {
       display: flex;
@@ -114,6 +110,13 @@
     }
     button:hover {
       transform: scale(1.05);
+    }
+    .thank-ou-message {
+      display: none;
+      text-align: center;
+      margin-top: 1rem;
+      color: green;
+      font-weight: bold;
     }
     .info-section {
       max-width: 800px;
@@ -170,25 +173,223 @@
       margin-top: 3rem;
       animation: fadeIn 1.5s ease-in;
     }
+
+    /* Styles for Investment Plans Section (copied from previous code) */
+    section#investment-plans {
+      padding: 40px 20px;
+      max-width: 900px;
+      width: 100%;
+      margin: 2rem auto; /* Added margin to fit into the main layout */
+      background: #fff; /* Added background for consistency */
+      border-radius: 15px; /* Added border-radius for consistency */
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05); /* Added box-shadow for consistency */
+    }
+    section#investment-plans h2 { /* Targeting h2 specifically within this section */
+      text-align: center;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #003366;
+      margin-bottom: 40px;
+      letter-spacing: 1.2px;
+      animation: fadeInDown 1s ease forwards;
+    }
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-25px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    ul.scheme-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    ul.scheme-list li.scheme-item {
+      color: #fff;
+      padding: 18px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      outline: none;
+      border: 3px solid transparent;
+    }
+    ul.scheme-list li.scheme-item:hover,
+    ul.scheme-list li.scheme-item:focus {
+      transform: scale(1.07);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+      outline: none;
+      border-color: #00509e;
+    }
+    ul.scheme-list li.scheme-item[data-plan="weekly"] {
+      background: #b87333; /* bronze */
+    }
+    ul.scheme-list li.scheme-item[data-plan="monthly"] {
+      background: #c0c0c0; /* silver */
+      color: #003366;
+      box-shadow: 0 6px 12px rgba(192,192,192,0.5);
+    }
+    ul.scheme-list li.scheme-item[data-plan="quarterly"] {
+      background: #ffd700; /* gold */
+      color: #003366;
+      box-shadow: 0 6px 12px rgba(255,215,0,0.4);
+    }
+    ul.scheme-list li.scheme-item[data-plan="halfyearly"] {
+      background: #daa520; /* goldenrod */
+    }
+    ul.scheme-list li.scheme-item[data-plan="yearly"] {
+      background: #b9f2ff; /* light cyan */
+      color: #003366;
+      box-shadow: 0 6px 12px rgba(185,242,255,0.4);
+    }
+    ul.scheme-list li.scheme-item[data-plan="twoyears"] {
+      background: #0077be; /* blue */
+    }
+    ul.scheme-list li.scheme-item[data-plan="threeyears"] {
+      background: #4b0082; /* indigo */
+    }
+    ul.scheme-list li.scheme-item[data-plan="fiveyears"] {
+      background: #6a5acd; /* slate blue */
+    }
+
+    .scheme-item .icon {
+      font-size: 1.4rem;
+      user-select: none;
+    }
+
+    /* Modal styles for Investment Plans (copied from previous code) */
+    #modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    #modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #plan-details {
+      background: #fff;
+      border-radius: 14px;
+      padding: 30px 40px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+      color: #333;
+      font-size: 1rem;
+      line-height: 1.6;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      transform: translateY(-30px);
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #modal-overlay.show #plan-details {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #plan-details h3 {
+      margin-top: 0;
+      color: #003366;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+    #plan-details ul {
+      padding-left: 20px;
+      margin-bottom: 20px;
+    }
+    #plan-details ul li {
+      margin-bottom: 10px;
+    }
+
+    #close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: #003366;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.2s ease;
+    }
+    #close-btn:hover,
+    #close-btn:focus {
+      background: #00509e;
+      outline: none;
+    }
+
+    /* Responsive adjustments for both sections */
+    @media (max-width: 600px) {
+      ul.scheme-list {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+      }
+      ul.scheme-list li.scheme-item {
+        font-size: 0.9rem;
+        padding: 14px 10px;
+      }
+      #plan-details {
+        padding: 20px 25px;
+        max-width: 90vw;
+        max-height: 70vh;
+      }
+      #close-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+        top: 12px;
+        right: 12px;
+      }
+    }
+
+    /* Styles for the logo */
+    .header-logo {
+      width: 150px; /* Adjust size as needed */
+      height: auto;
+      margin-bottom: 1rem; /* Space between logo and title */
+      animation: fadeIn 1.5s ease-in; /* Add fade-in animation */
+    }
+    @media (max-width: 600px) {
+      .header-logo {
+        width: 100px; /* Smaller logo on mobile */
+      }
+    }
   </style>
 </head>
 <body>
   <header>
-    <div id="utc-time"></div>
+    <div class="utc-time" id="utcTime"></div>
+    <img src="logo.png" alt="APDPSOLUTIONS Logo" class="header-logo">
     <h1>APDPSOLUTIONS</h1>
     <div class="subtitle">Unlock your financial potential with our investment strategies</div>
   </header>
 
-  <div class="launch-info">
-    🚀 We will launch our official website soon — this is our prelaunch site.
-  </div>
+  <div class="launch-info">🚀 This is our prelaunch website. Official launch coming soon.</div>
 
   <section class="form-section">
     <h2>Client Registration</h2>
-    <form action="https://formsubmit.co/apdpsolutions@gmail.com" method="POST">
-      <input type="hidden" name="_next" value="https://apdpsolutions.com/thank-you.html">
-      <input type="hidden" name="_captcha" value="false">
-
+    <form id="registrationForm">
       <label for="name">Full Name</label>
       <input type="text" id="name" name="name" required>
 
@@ -199,27 +400,13 @@
       <input type="text" id="country" name="country" required>
 
       <label for="mobile">Mobile Number</label>
-      <div class="phone-group">
-        <select name="code" required>
-          <option value="+1">+1 (US)</option>
-          <option value="+91">+91 (IN)</option>
-          <option value="+44">+44 (UK)</option>
-          <option value="+61">+61 (AU)</option>
-          <option value="+971">+971 (UAE)</option>
-          <option value="+81">+81 (JP)</option>
-          <option value="+49">+49 (DE)</option>
-          <option value="+86">+86 (CN)</option>
-          <option value="+33">+33 (FR)</option>
-          <option value="+34">+34 (ES)</option>
-          <!-- Add more country codes as needed -->
-        </select>
-        <input type="tel" id="mobile" name="mobile" required>
-      </div>
+      <input type="tel" id="mobile" name="mobile" required>
 
       <div class="form-buttons">
         <button type="submit">Register</button>
       </div>
     </form>
+    <div class="thank-you-message" id="thankYouMessage">Thank you for registering! We will contact you soon.</div>
   </section>
 
   <section class="info-section">
@@ -248,6 +435,93 @@
     </p>
   </section>
 
+  <section id="investment-plans" aria-label="Investment Plans">
+    <h2>Investment Plans</h2>
+
+    <ul class="scheme-list" role="listbox" tabindex="0" aria-label="Investment scheme list">
+      <li 
+        class="scheme-item" 
+        data-plan="weekly" 
+        role="option" 
+        tabindex="0" 
+        aria-selected="false"
+      >
+        <span class="icon" aria-hidden="true">⏳</span> WEEKLY – 7 DAYS (BRONZE)
+      </li>
+      <li 
+        class="scheme-item" 
+        data-plan="monthly" 
+        role="option" 
+        tabindex="-1" 
+        aria-selected="false"
+      >
+        <span class="icon" aria-hidden="true">📅</span> MONTHLY – 30 DAYS (SILVER)
+      </li>
+      <li 
+        class="scheme-item" 
+        data-plan="quarterly" 
+        role="option" 
+        tabindex="-1" 
+        aria-selected="false"
+      >
+        <span class="icon" aria-hidden="true">💰</span> QUARTERLY – 3 MONTHS (GOLD)
+      </li>
+      <li 
+        class="scheme-item" 
+        data-plan="halfyearly" 
+        role="option" 
+        tabindex="-1" 
+        aria-selected="false"
+      >
+        <span class="icon" aria-hidden="true">📈</span> HALF YEARLY – 6 MONTHS (GOLD PLUS)
+      </li>
+      <li 
+        class="scheme-item" 
+        data-plan="yearly" 
+        role="option" 
+        tabindex="-1" 
+        aria-selected="false"
+      >
+        <span class="icon" aria-hidden="true">🎯</span> YEARLY – 12 MONTHS (PLATINUM)
+      </li>
+      <li 
+        class="scheme-item" 
+        data-plan="twoyears" 
+        role="option" 
+        tabindex="-1" 
+        aria-selected="false"
+      >
+        <span class="icon" aria-hidden="true">🏆</span> TWO YEARS (DIAMOND)
+      </li>
+      <li 
+        class="scheme-item" 
+        data-plan="threeyears" 
+        role="option" 
+        tabindex="-1" 
+        aria-selected="false"
+      >
+        <span class="icon" aria-hidden="true">🚀</span> THREE YEARS (ELITE)
+      </li>
+      <li 
+        class="scheme-item" 
+        data-plan="fiveyears" 
+        role="option" 
+        tabindex="-1" 
+        aria-selected="false"
+      >
+        <span class="icon" aria-hidden="true">🌟</span> FIVE YEARS (LEGEND)
+      </li>
+    </ul>
+  </section>
+
+  <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
+    <div id="plan-details">
+      <button id="close-btn" aria-label="Close details modal">×</button>
+      <h3 id="modal-title">Plan Details</h3>
+      <div id="modal-content">Select a plan to see details.</div>
+    </div>
+  </div>
+
   <section class="contact-section">
     <h2>Contact With Us</h2>
     <a href="https://www.instagram.com/apdpsolutions/" target="_blank">
@@ -265,16 +539,204 @@
   </section>
 
   <footer>
-    &copy; 2025 APDPSOLUTIONS. All Rights Reserved.
+    © 2025 APDPSOLUTIONS. All Rights Reserved.
   </footer>
 
   <script>
+    // Existing script for form submission and UTC time
+    const form = document.getElementById("registrationForm");
+    const thankYou = document.getElementById("thankYouMessage");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const country = document.getElementById("country").value;
+      const mobile = document.getElementById("mobile").value;
+
+      fetch("https://formsubmit.co/ajax/apdpsolutions@gmail.com", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, country, mobile })
+      })
+      .then(res => res.ok ? thankYou.style.display = "block" : console.error("Failed to send. Try again."))
+      .catch((error) => console.error("Something went wrong:", error));
+
+      form.reset();
+    });
+
     function updateUTCTime() {
       const now = new Date();
-      document.getElementById('utc-time').textContent = now.toUTCString();
+      document.getElementById("utcTime").textContent = "UTC Time: " + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'UTC' });
     }
     setInterval(updateUTCTime, 1000);
     updateUTCTime();
+
+    // New script for Investment Plans section and modal
+    const planDetails = {
+      weekly: {
+        title: "WEEKLY – 7 DAYS (BRONZE)",
+        description: [
+          "Minimum investment: $100",
+          "Return: 10% weekly",
+          "Duration: 7 days",
+          "Ideal for short-term investors."
+        ]
+      },
+      monthly: {
+        title: "MONTHLY – 30 DAYS (SILVER)",
+        description: [
+          "Minimum investment: $500",
+          "Return: 15% monthly",
+          "Duration: 30 days",
+          "Great balance of risk and reward."
+        ]
+      },
+      quarterly: {
+        title: "QUARTERLY – 3 MONTHS (GOLD)",
+        description: [
+          "Minimum investment: $1500",
+          "Return: 20% quarterly",
+          "Duration: 3 months",
+          "For steady medium-term growth."
+        ]
+      },
+      halfyearly: {
+        title: "HALF YEARLY – 6 MONTHS (GOLD PLUS)",
+        description: [
+          "Minimum investment: $3000",
+          "Return: 25% half-yearly",
+          "Duration: 6 months",
+          "Higher returns with moderate lock-in."
+        ]
+      },
+      yearly: {
+        title: "YEARLY – 12 MONTHS (PLATINUM)",
+        description: [
+          "Minimum investment: $5000",
+          "Return: 30% yearly",
+          "Duration: 12 months",
+          "Best for long-term investors."
+        ]
+      },
+      twoyears: {
+        title: "TWO YEARS (DIAMOND)",
+        description: [
+          "Minimum investment: $10000",
+          "Return: 40% over 2 years",
+          "Duration: 24 months",
+          "Exclusive high-return plan."
+        ]
+      },
+      threeyears: {
+        title: "THREE YEARS (ELITE)",
+        description: [
+          "Minimum investment: $20000",
+          "Return: 60% over 3 years",
+          "Duration: 36 months",
+          "Premium plan for significant growth."
+        ]
+      },
+      fiveyears: {
+        title: "FIVE YEARS (LEGEND)",
+        description: [
+          "Minimum investment: $50000",
+          "Return: 100% over 5 years",
+          "Duration: 60 months",
+          "Ultimate long-term wealth creation."
+        ]
+      }
+    };
+
+    // Get references to DOM elements for investment plans
+    const schemeList = document.querySelector('.scheme-list');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalTitle = document.getElementById('modal-title');
+    const modalContent = document.getElementById('modal-content');
+    const closeBtn = document.getElementById('close-btn');
+
+    /**
+     * Displays the modal with the details of the selected plan.
+     * @param {string} planKey - The key of the plan to display (e.g., 'weekly', 'monthly').
+     */
+    function showPlanDetails(planKey) {
+      const plan = planDetails[planKey];
+      if (plan) {
+        modalTitle.textContent = plan.title;
+        modalContent.innerHTML = ''; // Clear previous content
+
+        const ul = document.createElement('ul');
+        plan.description.forEach(item => {
+          const li = document.createElement('li');
+          li.textContent = item;
+          ul.appendChild(li);
+        });
+        modalContent.appendChild(ul);
+
+        modalOverlay.classList.add('show');
+        modalOverlay.focus(); // Focus the modal for accessibility
+      } else {
+        modalTitle.textContent = "Plan Not Found";
+        modalContent.innerHTML = "<p>Details for this plan are not available.</p>";
+        modalOverlay.classList.add('show');
+        modalOverlay.focus();
+      }
+    }
+
+    /**
+     * Hides the modal.
+     */
+    function hideModal() {
+      modalOverlay.classList.remove('show');
+    }
+
+    // Event listener for clicking on investment scheme items
+    schemeList.addEventListener('click', (event) => {
+      const targetItem = event.target.closest('.scheme-item');
+      if (targetItem) {
+        const planKey = targetItem.dataset.plan;
+        showPlanDetails(planKey);
+
+        // Update aria-selected for accessibility
+        document.querySelectorAll('.scheme-item').forEach(item => {
+          item.setAttribute('aria-selected', 'false');
+        });
+        targetItem.setAttribute('aria-selected', 'true');
+      }
+    });
+
+    // Event listener for keyboard navigation (Enter/Space) on investment scheme items
+    schemeList.addEventListener('keydown', (event) => {
+      const targetItem = event.target.closest('.scheme-item');
+      if (targetItem && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault(); // Prevent default scroll behavior for spacebar
+        const planKey = targetItem.dataset.plan;
+        showPlanDetails(planKey);
+
+        // Update aria-selected for accessibility
+        document.querySelectorAll('.scheme-item').forEach(item => {
+          item.setAttribute('aria-selected', 'false');
+        });
+        targetItem.setAttribute('aria-selected', 'true');
+      }
+    });
+
+    // Event listener for closing the modal via the close button
+    closeBtn.addEventListener('click', hideModal);
+
+    // Event listener for closing the modal by clicking outside it
+    modalOverlay.addEventListener('click', (event) => {
+      if (event.target === modalOverlay) {
+        hideModal();
+      }
+    });
+
+    // Event listener for closing the modal with the Escape key
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && modalOverlay.classList.contains('show')) {
+        hideModal();
+      }
+    });
   </script>
 </body>
 </html>
