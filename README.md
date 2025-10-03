@@ -1,1134 +1,504 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /contests/{contestId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /entries/{entryId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && request.auth.token.admin == true;
+      allow delete: if request.auth != null && (request.auth.token.admin == true || resource.data.userId == request.auth.uid);
+    }
+    match /payments/{paymentId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /votes/{voteId} {
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read: if true;
+    }
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
 
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>APDPSOLUTIONS - Unlock Your Financial Potential</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    /* General styles for the APDPSOLUTIONS website */
-    * {
-      box-sizing: border-box;
-    }
-    html, body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
-      color: #333;
-      scroll-behavior: smooth;
-      overflow-x: hidden; /* Prevent horizontal scroll due to animations */
-    }
-    header {
-      background: linear-gradient(135deg, #00274d, #005792);
-      color: white;
-      text-align: center;
-      padding: 4rem 1rem 2rem 1rem;
-      position: relative;
-      animation: slideInFromTop 1s ease-in-out;
-      overflow: hidden; /* Hide overflow from 3D canvas */
-      min-height: 250px; /* Ensure header has enough height for canvas */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    #three-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0; /* Place behind text */
-      opacity: 0.3; /* Make it subtle initially */
-    }
-    header h1, .subtitle, .utc-time {
-      position: relative; /* Bring text above canvas */
-      z-index: 1;
-    }
-    .utc-time {
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      font-size: 1rem;
-      color: #fff;
-    }
-    @keyframes slideInFromTop {
-      0% { transform: translateY(-100%); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
-    }
-    header h1 {
-      font-size: 2.8rem;
-      margin: 0;
-      animation: scaleIn 1.2s ease-in-out;
-    }
-    @keyframes scaleIn {
-      0% { transform: scale(0); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .subtitle {
-      font-size: 1.3rem;
-      margin-top: 0.5rem;
-      font-weight: 300;
-      /* Initial state for typing animation */
-      white-space: nowrap;
-      overflow: hidden;
-      width: 0;
-      border-right: .15em solid orange; /* The caret */
-      animation: typing 3s forwards, blink-caret .75s step-end infinite;
-      animation-delay: 1.5s; /* Delay after header animation */
-    }
-
-    /* Typing animation */
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
-    }
-
-    /* Blinking caret animation */
-    @keyframes blink-caret {
-      from, to { border-color: transparent }
-      50% { border-color: white; }
-    }
-
-    @keyframes fadeInUp {
-      0% { opacity: 0; transform: translateY(30px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Scroll-triggered animation styles */
-    .animated-section {
-      opacity: 0;
-      transform: translateY(50px);
-      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-    }
-    .animated-section.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .form-section {
-      background: white;
-      max-width: 500px;
-      margin: 2rem auto;
-      padding: 2rem;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-      transition: transform 0.3s;
-    }
-    .form-section:hover {
-      transform: translateY(-5px);
-    }
-    .form-section h2 {
-      text-align: center;
-      margin-bottom: 1rem;
-      color: #005792;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-    }
-    label {
-      margin-top: 1em;
-      font-weight: 500;
-    }
-    input, select {
-      padding: 0.7em;
-      margin-top: 0.3em;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    .form-buttons {
-      display: flex;
-      justify-content: center;
-      margin-top: 1.5rem;
-      position: relative; /* For loading spinner positioning */
-    }
-    button {
-      padding: 0.7em 1.2em;
-      background: linear-gradient(to right, #00b4db, #0083b0);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s ease, transform 0.2s;
-    }
-    button:hover {
-      transform: scale(1.05);
-    }
-    .thank-you-message {
-      display: none;
-      text-align: center;
-      margin-top: 1rem;
-      color: green;
-      font-weight: bold;
-    }
-    .info-section {
-      max-width: 800px;
-      margin: 2rem auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    }
-    .info-section h2 {
-      color: #005792;
-      margin-bottom: 1rem;
-    }
-    .info-section p {
-      line-height: 1.7;
-    }
-    .contact-section {
-      text-align: center;
-      padding: 2rem;
-      background: linear-gradient(to right, #e3f2fd, #cce7ff);
-      margin: 2rem auto;
-      max-width: 800px;
-      border-radius: 15px;
-    }
-    .contact-section a {
-      display: inline-block;
-      margin: 0.5rem 1rem;
-      color: #005792;
-      text-decoration: none;
-      font-weight: 500;
-      transition: transform 0.3s, box-shadow 0.3s; /* Added box-shadow transition */
-      padding: 8px 12px; /* Added padding for better hover area */
-      border-radius: 8px; /* Rounded corners for hover effect */
-    }
-    .contact-section a:hover {
-      transform: scale(1.1);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Added shadow on hover */
-      background-color: rgba(0, 87, 146, 0.1); /* Subtle background on hover */
-    }
-    .contact-section img {
-      width: 24px;
-      height: 24px;
-      vertical-align: middle;
-      margin-right: 8px;
-    }
-    .launch-info {
-      text-align: center;
-      padding: 1rem;
-      font-weight: bold;
-      color: #d32f2f;
-      font-size: 1.2rem;
-      animation: pulse 2s infinite; /* Pulsing animation */
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.03); opacity: 0.9; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    footer {
-      background: #00274d;
-      color: white;
-      text-align: center;
-      padding: 1em;
-      margin-top: 3rem;
-      animation: fadeIn 1.5s ease-in;
-    }
-
-    /* Styles for Investment Plans Section */
-    section#investment-plans {
-      padding: 40px 20px;
-      max-width: 900px;
-      width: 100%;
-      margin: 2rem auto;
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    }
-    section#investment-plans h2 {
-      text-align: center;
-      font-size: 2.8rem;
-      font-weight: 700;
-      color: #003366;
-      margin-bottom: 40px;
-      letter-spacing: 1.2px;
-      animation: fadeInDown 1s ease forwards;
-    }
-    ul.scheme-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-    }
-    ul.scheme-list li.scheme-item {
-      color: #fff;
-      padding: 18px 16px;
-      border-radius: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-      transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease; /* Added background transition */
-      user-select: none;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1rem;
-      outline: none;
-      border: 3px solid transparent;
-    }
-    ul.scheme-list li.scheme-item:hover,
-    ul.scheme-list li.scheme-item:focus {
-      transform: scale(1.07);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.25);
-      outline: none;
-      border-color: #00509e;
-      background: linear-gradient(to right, #00b4db, #0083b0); /* Highlight on hover */
-      color: white; /* Ensure text color remains readable */
-    }
-    /* Specific hover colors for different schemes */
-    ul.scheme-list li.scheme-item[data-plan="monthly"]:hover,
-    ul.scheme-list li.scheme-item[data-plan="quarterly"]:hover,
-    ul.scheme-list li.scheme-item[data-plan="yearly"]:hover {
-      color: white; /* Change text to white on hover for light schemes */
-    }
-
-    ul.scheme-list li.scheme-item[data-plan="weekly"] { background: #b87333; }
-    ul.scheme-list li.scheme-item[data-plan="monthly"] { background: #c0c0c0; color: #003366; box-shadow: 0 6px 12px rgba(192,192,192,0.5); }
-    ul.scheme-list li.scheme-item[data-plan="quarterly"] { background: #ffd700; color: #003366; box-shadow: 0 6px 12px rgba(255,215,0,0.4); }
-    ul.scheme-list li.scheme-item[data-plan="halfyearly"] { background: #daa520; }
-    ul.scheme-list li.scheme-item[data-plan="yearly"] { background: #b9f2ff; color: #003366; box-shadow: 0 6px 12px rgba(185,242,255,0.4); }
-    ul.scheme-list li.scheme-item[data-plan="twoyears"] { background: #0077be; }
-    ul.scheme-list li.scheme-item[data-plan="threeyears"] { background: #4b0082; }
-    ul.scheme-list li.scheme-item[data-plan="fiveyears"] { background: #6a5acd; }
-
-    .scheme-item .icon {
-      font-size: 1.4rem;
-      user-select: none;
-    }
-
-    /* Modal styles for Investment Plans */
-    #modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
-    #modal-overlay.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    #plan-details {
-      background: #fff;
-      border-radius: 14px;
-      padding: 30px 40px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.2);
-      color: #333;
-      font-size: 1rem;
-      line-height: 1.6;
-      max-width: 600px;
-      max-height: 80vh;
-      overflow-y: auto;
-      position: relative;
-      transform: translateY(-30px);
-      opacity: 0;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-    #modal-overlay.show #plan-details {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    #plan-details h3 {
-      margin-top: 0;
-      color: #003366;
-      font-weight: 700;
-      margin-bottom: 18px;
-    }
-    #plan-details ul {
-      padding-left: 20px;
-      margin-bottom: 20px;
-    }
-    #plan-details ul li {
-      margin-bottom: 10px;
-    }
-
-    #close-btn {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: #003366;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 1.2rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: background 0.2s ease;
-    }
-    #close-btn:hover,
-    #close-btn:focus {
-      background: #00509e;
-      outline: none;
-    }
-
-    /* Responsive adjustments for all sections */
-    @media (max-width: 600px) {
-      ul.scheme-list {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 12px;
-      }
-      ul.scheme-list li.scheme-item {
-        font-size: 0.9rem;
-        padding: 14px 10px;
-      }
-      #plan-details {
-        padding: 20px 25px;
-        max-width: 90vw;
-        max-height: 70vh;
-      }
-      #close-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 1rem;
-        top: 12px;
-        right: 12px;
-      }
-      header {
-        padding: 3rem 1rem 1.5rem 1rem;
-      }
-      header h1 {
-        font-size: 2.2rem;
-      }
-      .subtitle {
-        font-size: 1rem;
-      }
-    }
-
-    /* Styles for mobile number and country code */
-    .mobile-input-group {
-      display: flex;
-      gap: 10px; /* Space between select and input */
-      margin-top: 0.3em;
-    }
-    .mobile-input-group select {
-      flex-shrink: 0; /* Prevent select from shrinking */
-      width: auto; /* Allow select to size based on content */
-    }
-    .mobile-input-group input {
-      flex-grow: 1; /* Allow input to take remaining space */
-    }
-
-    /* Back to Top Button */
-    #backToTopBtn {
-      display: none; /* Hidden by default */
-      position: fixed; /* Fixed position */
-      bottom: 20px; /* Place at the bottom */
-      right: 30px; /* Place at the right */
-      z-index: 99; /* Ensure it's above other content */
-      border: none; /* Remove borders */
-      outline: none; /* Remove outline */
-      background-color: #005792; /* Background color */
-      color: white; /* Text color */
-      cursor: pointer; /* Add a mouse pointer on hover */
-      padding: 15px; /* Some padding */
-      border-radius: 10px; /* Rounded corners */
-      font-size: 18px; /* Increase font size */
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      transition: background-color 0.3s, transform 0.3s;
-    }
-
-    #backToTopBtn:hover {
-      background-color: #003366; /* Darker background on hover */
-      transform: translateY(-3px); /* Slight lift on hover */
-    }
-
-    /* Form Submission Message Box */
-    #formMessageBox {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #fff;
-      padding: 25px 35px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      z-index: 1000;
-      text-align: center;
-      font-weight: bold;
-      animation: fadeInScale 0.3s ease-out;
-    }
-    #formMessageBox.success {
-      color: #28a745;
-    }
-    #formMessageBox.error {
-      color: #dc3545;
-    }
-    #formMessageBox button {
-      margin-top: 15px;
-      padding: 8px 20px;
-      background-color: #005792;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: normal;
-    }
-    #formMessageBox button:hover {
-      background-color: #003366;
-    }
-
-    @keyframes fadeInScale {
-      from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    }
-
-    /* Loading Spinner */
-    .spinner {
-      border: 4px solid rgba(255, 255, 255, 0.3);
-      border-top: 4px solid #fff;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      animation: spin 1s linear infinite;
-      display: none; /* Hidden by default */
-      position: absolute;
-      right: 15px; /* Adjust position relative to button */
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Zoko Talent — Mockup Preview</title>
+<style>
+  :root{--green:#4CAF50;--blue:#1A237E;--muted:#666}
+  body{font-family:Inter,system-ui,Arial;background:#f6f8fb;margin:0;color:#111}
+  header{background:var(--green);color:#fff;padding:28px 36px;display:flex;align-items:center;justify-content:space-between}
+  .logo{font-weight:800;letter-spacing:1px}
+  main{max-width:1100px;margin:28px auto;padding:0 16px}
+  .hero{background:#fff;padding:28px;border-radius:10px;display:flex;gap:20px;align-items:center}
+  .hero h1{margin:0;font-size:34px}
+  .hero p{margin:6px 0;color:var(--muted)}
+  .card{background:#fff;padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(12,14,20,0.05)}
+  .contest-grid{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:18px}
+  .contest-info h2{margin:0}
+  .meta{color:var(--muted);margin-top:6px}
+  .countdown{background:var(--green);color:white;padding:16px;border-radius:8px;text-align:center}
+  .countdown h3{margin:0;font-size:18px}
+  .qr{margin-top:12px;padding:12px;border-radius:8px;background:#fff;border:1px solid #eee;text-align:center}
+  .btn{background:var(--green);color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+  .btn-muted{background:#eee;color:#333;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:16px}
+  .entry{background:#fff;border-radius:8px;overflow:hidden;border:1px solid #eee}
+  .entry img, .entry video{width:100%;height:160px;object-fit:cover;display:block}
+  .entry .meta{padding:8px;display:flex;justify-content:space-between;align-items:center}
+  .small{font-size:13px;color:var(--muted)}
+  .leader{margin-top:16px}
+  footer{margin:28px 0;text-align:center;color:var(--muted)}
+  .admin{margin-top:18px;padding:12px;border-radius:8px;background:#fff;border:1px dashed #ddd}
+  .badge{background:gold;padding:4px 8px;border-radius:6px;font-weight:600}
+  input[type=file]{border:none}
+  .flex{display:flex;gap:8px;align-items:center}
+  .muted{color:var(--muted)}
+  .pill{padding:6px 10px;border-radius:999px;background:#f3f6f4;color:#085; font-weight:700}
+  @media(max-width:880px){ .contest-grid{grid-template-columns:1fr} .hero{flex-direction:column;align-items:flex-start} }
+</style>
 </head>
 <body>
-  <header>
-    <canvas id="three-canvas"></canvas>
-    <div class="utc-time" id="utcTime"></div>
-    <h1>APDPSOLUTIONS</h1>
-    <div class="subtitle" id="header-subtitle">Unlock your financial potential with our investment strategies</div>
-  </header>
 
-  <div class="launch-info">🚀 This is our prelaunch website. Official launch coming soon.</div>
+<header>
+  <div style="display:flex;align-items:center;gap:14px">
+    <div style="background:#fff;padding:6px 10px;border-radius:8px;color:var(--green);font-weight:800" class="logo">ZOKO</div>
+    <div style="color:#fff;font-weight:600">Talent</div>
+  </div>
+  <nav style="color:#fff;display:flex;gap:14px;align-items:center">
+    <a href="#" style="color:#fff;text-decoration:none">Contests</a>
+    <a href="#" style="color:#fff;text-decoration:none">Profile</a>
+    <button class="btn" onclick="openAdmin()">Admin</button>
+  </nav>
+</header>
 
-  <section class="form-section animated-section">
-    <h2>Client Registration</h2>
-    <form id="registrationForm">
-      <label for="name">Full Name</label>
-      <input type="text" id="name" name="name" required>
-
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required>
-
-      <label for="country">Country</label>
-      <input type="text" id="country" name="country" required>
-
-      <label for="mobile">Mobile Number</label>
-      <div class="mobile-input-group">
-        <select id="countryCode" name="countryCode">
-          <option value="+1">+1 (USA/Canada)</option>
-          <option value="+44">+44 (UK)</option>
-          <option value="+91" selected>+91 (India)</option>
-          <option value="+61">+61 (Australia)</option>
-          <option value="+49">+49 (Germany)</option>
-          <option value="+33">+33 (France)</option>
-          <option value="+81">+81 (Japan)</option>
-          <option value="+86">+86 (China)</option>
-          <option value="+971">+971 (UAE)</option>
-          <option value="+65">+65 (Singapore)</option>
-          <option value="+27">+27 (South Africa)</option>
-          </select>
-        <input type="tel" id="mobile" name="mobile" required>
+<main>
+  <div class="hero card">
+    <div style="flex:1">
+      <h1>Unleash Your Skills, Win Rewards</h1>
+      <p>Storytelling • Cooking • Fancy Dress • Fashion — Compete, get voted, and win prizes</p>
+      <div style="margin-top:12px">
+        <button class="btn" onclick="scrollToContest()">Join Contest</button>
+        <button class="btn-muted" style="margin-left:8px" onclick="alert('Create Contest — admin only in real app')">Create Contest</button>
       </div>
-
-      <div class="form-buttons">
-        <button type="submit" id="submitButton">Register</button>
-        <div class="spinner" id="formSpinner"></div>
+    </div>
+    <div style="width:320px;text-align:right">
+      <div style="background:#f1fff4;padding:12px;border-radius:8px;color:var(--green)">
+        <div style="font-size:12px">Featured</div>
+        <div style="font-weight:700;margin-top:6px">Fancy Dress: Retro Challenge</div>
+        <div class="small" style="margin-top:6px">Prize ₹1000 • Ends in <span id="top-count">--</span></div>
       </div>
-    </form>
-    <div class="thank-you-message" id="thankYouMessage">Thank you for registering! We will contact you soon.</div>
-  </section>
-
-  <section id="investment-plans" aria-label="Investment Plans" class="animated-section">
-    <h2>Investment Plans</h2>
-
-    <ul class="scheme-list" role="listbox" tabindex="0" aria-label="Investment scheme list">
-      <li 
-        class="scheme-item" 
-        data-plan="weekly" 
-        role="option" 
-        tabindex="0" 
-        aria-selected="false"
-      >
-        <span class="icon" aria-hidden="true">⏳</span> WEEKLY – 7 DAYS (BRONZE)
-      </li>
-      <li 
-        class="scheme-item" 
-        data-plan="monthly" 
-        role="option" 
-        tabindex="-1" 
-        aria-selected="false"
-      >
-        <span class="icon" aria-hidden="true">📅</span> MONTHLY – 30 DAYS (SILVER)
-      </li>
-      <li 
-        class="scheme-item" 
-        data-plan="quarterly" 
-        role="option" 
-        tabindex="-1" 
-        aria-selected="false"
-      >
-        <span class="icon" aria-hidden="true">💰</span> QUARTERLY – 3 MONTHS (GOLD)
-      </li>
-      <li 
-        class="scheme-item" 
-        data-plan="halfyearly" 
-        role="option" 
-        tabindex="-1" 
-        aria-selected="false"
-      >
-        <span class="icon" aria-hidden="true">📈</span> HALF YEARLY – 6 MONTHS (GOLD PLUS)
-      </li>
-      <li 
-        class="scheme-item" 
-        data-plan="yearly" 
-        role="option" 
-        tabindex="-1" 
-        aria-selected="false"
-      >
-        <span class="icon" aria-hidden="true">🎯</span> YEARLY – 12 MONTHS (DIAMOND)
-      </li>
-      <li 
-        class="scheme-item" 
-        data-plan="twoyears" 
-        role="option" 
-        tabindex="-1" 
-        aria-selected="false"
-      >
-        <span class="icon" aria-hidden="true">🏆</span> TWO YEARS (DIAMOND PLUS)
-      </li>
-      <li 
-        class="scheme-item" 
-        data-plan="threeyears" 
-        role="option" 
-        tabindex="-1" 
-        aria-selected="false"
-      >
-        <span class="icon" aria-hidden="true">🚀</span> THREE YEARS (PLATINUM)
-      </li>
-      <li 
-        class="scheme-item" 
-        data-plan="fiveyears" 
-        role="option" 
-        tabindex="-1" 
-        aria-selected="false"
-      >
-        <span class="icon" aria-hidden="true">🌟</span> FIVE YEARS (PLATINUM PLUS)
-      </li>
-    </ul>
-  </section>
-
-  <section class="info-section animated-section">
-    <h2>Your Data is Safe</h2>
-    <p>At APDPSOLUTIONS, we take your privacy and data security seriously. All client information is encrypted and stored securely. We never share your personal data with third parties without your consent.</p>
-  </section>
-
-  <section class="info-section animated-section">
-    <h2>About Us</h2>
-    <p>APDPSOLUTIONS is a forward-thinking investment platform created to empower clients with the tools and opportunities to grow their wealth. Our platform combines secure technology, expert insight, and transparent practices to create a trusted investment environment. We are committed to helping you achieve your financial goals through strategic fundraising and personalized client service.</p>
-  </section>
-
-  <section class="info-section animated-section">
-    <h2>Why Fund Us?</h2>
-    <p>
-      - We offer a unique approach to secure, blockchain-based fundraising.<br />
-      - Transparent and fast USDT (TRC20) crypto payments.<br />
-      - Dedicated support and regular updates for investors.<br />
-      - We align our success with yours — we grow together.<br />
-      - Advanced tools to monitor and manage your investments in real-time.<br />
-      - Security of capital is our top priority.<br />
-      - Enjoy consistent returns and growth.<br />
-      - Backed by strong past performance metrics.<br />
-      - Read real user testimonials from our satisfied investors.<br />
-      - Unlock passive income potential through our optimized strategies.
-    </p>
-  </section>
-
-  <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1">
-    <div id="plan-details">
-      <button id="close-btn" aria-label="Close details modal">×</button>
-      <h3 id="modal-title">Plan Details</h3>
-      <div id="modal-content">Select a plan to see details.</div>
     </div>
   </div>
 
-  <section class="contact-section animated-section">
-    <h2>Contact With Us</h2>
-    <a href="https://www.instagram.com/apdpsolutions/" target="_blank">
-      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" />Instagram
-    </a>
-    <a href="https://t.me/apdpsolutions" target="_blank">
-      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram" />Telegram
-    </a>
-    <a href="#" id="emailLink">
-      <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" alt="Email" />Email
-    </a>
-    <a href="https://www.youtube.com/@apdpsolutions-n6g" target="_blank">
-      <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" />YouTube
-    </a>
-  </section>
+  <!-- Contest area -->
+  <div id="contest-area" class="contest-grid">
+    <div>
 
-  <footer>
-    © 2025 APDPSOLUTIONS. All Rights Reserved.
-  </footer>
+      <div class="card contest-info">
+        <h2>Storytelling — Short Story Stars</h2>
+        <div class="meta">Category: Storytelling • Prize: ₹700 • Fee: ₹30</div>
+        <div style="margin-top:12px">
+          <div class="small"><strong>Start:</strong> Oct 5, 2025 • <strong>End:</strong> Oct 12, 2025</div>
+          <div style="margin-top:8px">FAQ: Submit a recorded story or text (max 5 minutes or 800 words). One entry per user.</div>
+        </div>
+        <div style="margin-top:12px;">
+          <button class="btn" onclick="openContest('story')">Join Storytelling</button>
+        </div>
+      </div>
 
-  <button onclick="topFunction()" id="backToTopBtn" title="Go to top">
-    <i class="fas fa-arrow-up"></i>
-  </button>
+      <div style="margin-top:12px" class="card contest-info">
+        <h2>Best Healthy Snack</h2>
+        <div class="meta">Category: Cooking • Prize: ₹500 • Fee: ₹50</div>
+        <div style="margin-top:12px">
+          <div class="small"><strong>Start:</strong> Oct 1, 2025 • <strong>End:</strong> Oct 10, 2025</div>
+          <div style="margin-top:8px">FAQ: Submit a photo and short recipe. One entry per user.</div>
+        </div>
+        <div style="margin-top:12px;">
+          <button class="btn" onclick="openContest('cook')">Join Cooking</button>
+        </div>
+      </div>
 
-  <div id="formMessageBox">
-    <p id="messageText"></p>
-    <button onclick="hideMessageBox()">OK</button>
+      <div style="margin-top:12px" class="card contest-info">
+        <h2>Fancy Dress: Retro Challenge</h2>
+        <div class="meta">Category: Fancy Dress • Prize: ₹1000 • Fee: ₹40</div>
+        <div style="margin-top:12px">
+          <div class="small"><strong>Start:</strong> Sep 28, 2025 • <strong>End:</strong> Oct 8, 2025</div>
+          <div style="margin-top:8px">FAQ: Costume creativity counts. Kids and Adults categories available.</div>
+        </div>
+        <div style="margin-top:12px;">
+          <button class="btn" onclick="openContest('fancy')">Join Fancy Dress</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="card contest-info">
+        <h2>Stylish Dressing — Fashion Star</h2>
+        <div class="meta">Category: Fashion • Prize: ₹1500 • Fee: ₹60</div>
+        <div style="margin-top:12px">
+          <div class="small"><strong>Start:</strong> Oct 3, 2025 • <strong>End:</strong> Oct 15, 2025</div>
+          <div style="margin-top:8px">FAQ: Show your best styled outfit. Short video or image allowed.</div>
+        </div>
+        <div style="margin-top:12px;">
+          <button class="btn" onclick="openContest('fashion')">Join Fashion</button>
+        </div>
+      </div>
+
+    <div>
+      <div class="card contest-info">
+        <h2>Best Healthy Snack</h2>
+        <div class="meta">Category: Cooking • Prize: ₹500 • Fee: ₹50</div>
+        <div style="margin-top:12px">
+          <div class="small"><strong>Start:</strong> Oct 1, 2025 • <strong>End:</strong> Oct 10, 2025</div>
+          <div style="margin-top:8px">FAQ: Submit a photo and short recipe. One entry per user.</div>
+        </div>
+
+        <div style="margin-top:12px" id="statusBox"></div>
+
+        <div style="margin-top:12px;">
+          <button class="btn" onclick="openContest()">Join Contest</button>
+        </div>
+
+        <div style="margin-top:16px" class="leader card">
+          <h3 style="margin:0 0 8px 0">Recent Winners</h3>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;padding:8px;border-radius:8px;background:#fff;text-align:center">
+              <div class="badge">1</div>
+              <div style="margin-top:6px;font-weight:700">Anna Smith</div>
+              <div class="small">₹1000</div>
+            </div>
+            <div style="flex:1;padding:8px;border-radius:8px;background:#fff;text-align:center">
+              <div class="badge">2</div>
+              <div style="margin-top:6px;font-weight:700">John Doe</div>
+              <div class="small">₹500</div>
+            </div>
+            <div style="flex:1;padding:8px;border-radius:8px;background:#fff;text-align:center">
+              <div class="badge">3</div>
+              <div style="margin-top:6px;font-weight:700">Mary Johnson</div>
+              <div class="small">₹300</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:12px" class="card">
+        <h3 style="margin-top:0">Gallery Preview</h3>
+        <div class="gallery" id="gallery">
+          <!-- entries inserted by JS -->
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <div class="card countdown">
+        <h3>Time left to participate</h3>
+        <div id="countdownLarge" style="font-size:22px;margin-top:8px;font-weight:800">--</div>
+        <div style="margin-top:12px">
+          <button class="btn" onclick="openContest()">Join Contest</button>
+        </div>
+      </div>
+
+      <div class="qr card">
+        <div style="font-weight:700">Pay via UPI</div>
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANwAAADcAQMAAABi5qhEAAAABlBMVEX///8AAABVwtN+AAABGElEQVR4nO3QMQEAAADCIPunNscKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwF6n0AAXr+z3gAAAAASUVORK5CYII=" alt="QR" style="width:160px;height:160px;background:#eee;display:block;margin:12px auto">
+        <div class="small">UPI ID: <strong>thannirudurgaprasad-10@okaxis</strong></div>
+        <div style="margin-top:10px;font-size:13px;color:var(--muted)">Or click Pay to simulate payment</div>
+        <div style="margin-top:8px">
+          <button class="btn" onclick="mockPay()">Simulate Pay ₹50</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="card">
+        <h4 style="margin:0 0 8px 0">Leaderboard (Top)</h4>
+        <ol id="miniLeaderboard" style="padding-left:18px;margin:0">
+          <!-- filled by JS -->
+        </ol>
+      </div>
+    </aside>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script>
-    // Global variables for message box
-    const formMessageBox = document.getElementById('formMessageBox');
-    const messageText = document.getElementById('messageText');
+  <!-- Contest modal / details -->
+  <div id="contestModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;align-items:center;justify-content:center;">
+    <div style="width:95%;max-width:880px;background:#fff;border-radius:10px;padding:18px;position:relative;">
+      <button onclick="closeContest()" style="position:absolute;right:14px;top:10px;border:none;background:#eee;padding:6px;border-radius:6px">Close</button>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <div style="flex:1;min-width:300px">
+          <h2 style="margin-top:0">Best Healthy Snack — Join</h2>
+          <div class="small">Category: Cooking • Prize: ₹500 • Fee: ₹50</div>
+          <div style="margin-top:12px">
+            <div id="paySection">
+              <div style="margin-bottom:8px" class="small">Scan QR or click simulate pay</div>
+              <img src="" id="qrLarge" style="width:180px;height:180px;background:#eee;display:block;margin-bottom:8px" alt="QR">
+              <div>
+                <button class="btn" onclick="mockPay()">Simulate Pay ₹50</button>
+                <button class="btn-muted" onclick="markPaidManually()">I have paid (manual)</button>
+              </div>
+            </div>
 
-    /**
-     * Displays a message box with a given message and type (success/error).
-     * @param {string} message - The message to display.
-     * @param {string} type - 'success' or 'error'.
-     */
-    function showMessageBox(message, type) {
-      messageText.textContent = message;
-      formMessageBox.className = ''; // Clear existing classes
-      formMessageBox.classList.add(type);
-      formMessageBox.style.display = 'block';
-    }
+            <div id="uploadArea" style="display:none;margin-top:14px">
+              <div class="small" style="margin-bottom:8px">Upload your entry (JPG/PNG/MP4). Entry will be visible after admin approval.</div>
+              <input type="file" id="entryFile"><br>
+              <input id="captionInput" class="small" placeholder="Caption (optional)" style="width:100%;padding:8px;margin-top:8px"/>
+              <div style="margin-top:8px">
+                <button class="btn" onclick="submitMockEntry()">Upload Entry</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    /**
-     * Hides the message box.
-     */
-    function hideMessageBox() {
-      formMessageBox.style.display = 'none';
-    }
+        <div style="width:320px">
+          <div class="card small" style="padding:12px">
+            <strong>Contest Rules</strong>
+            <ul style="padding-left:18px;color:var(--muted)">
+              <li>One entry per user</li>
+              <li>Appropriate content only</li>
+              <li>Admin will approve entries</li>
+            </ul>
+            <div style="margin-top:8px">FAQ: <span class="small muted">When will winners be announced? Within 3 days after closing.</span></div>
+          </div>
 
-    // Existing script for form submission and UTC time
-    const form = document.getElementById("registrationForm");
-    const submitButton = document.querySelector("#registrationForm button[type='submit']");
-    const formSpinner = document.getElementById("formSpinner");
+          <div style="margin-top:10px" class="card">
+            <strong>Recent Top</strong>
+            <div id="detailTop" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    form.addEventListener("submit", async function (e) {
-      e.preventDefault();
+  <!-- Admin Panel (simple) -->
+  <div id="adminPanel" style="display:none;position:fixed;right:12px;bottom:12px;width:360px;z-index:9999">
+    <div class="admin">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Admin</strong>
+        <button onclick="closeAdmin()" style="background:#eee;border:none;padding:6px;border-radius:6px">Close</button>
+      </div>
 
-      // Show spinner and disable button
-      submitButton.disabled = true;
-      formSpinner.style.display = 'block';
+      <div style="margin-top:8px">
+        <div style="font-size:13px;margin-bottom:6px">Pending uploads</div>
+        <div id="pendingList" style="max-height:160px;overflow:auto"></div>
+      </div>
 
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-      const country = document.getElementById("country").value;
-      const countryCode = document.getElementById("countryCode").value;
-      const mobile = document.getElementById("mobile").value;
+      <div style="margin-top:10px">
+        <div style="font-size:13px;margin-bottom:6px">Pending payments (manual)</div>
+        <div id="pendingPayments" style="max-height:120px;overflow:auto"></div>
+      </div>
 
-      const fullMobile = countryCode + mobile;
+      <div style="margin-top:10px">
+        <button class="btn" onclick="approveAllMock()">Approve All (mock)</button>
+        <button class="btn-muted" style="margin-left:6px" onclick="awardWinnersMock()">Award Top 10</button>
+      </div>
+    </div>
+  </div>
 
-      try {
-        const response = await fetch("https://formsubmit.co/ajax/apdpsolutions@gmail.com", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, country, mobile: fullMobile })
-        });
+  <footer>
+    Zoko Talent — Mockup • This preview is static and simulates app flows. For full product we integrate Firebase & Razorpay.
+  </footer>
+</main>
 
-        if (response.ok) {
-          showMessageBox("Thank you for registering! We will contact you soon.", "success");
-          form.reset();
-        } else {
-          showMessageBox("Failed to send your registration. Please try again.", "error");
-          console.error("Form submission failed:", response.statusText);
-        }
-      } catch (error) {
-        showMessageBox("An error occurred during submission. Please check your internet connection.", "error");
-        console.error("Something went wrong:", error);
-      } finally {
-        // Hide spinner and enable button
-        submitButton.disabled = false;
-        formSpinner.style.display = 'none';
-      }
-    });
+<script>
+/* ---------- MOCK DATA & STATE ---------- */
+let mockEntries = [
+  { id:'e1', name:'Aisha', caption:'Healthy oats cookie', file:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=60', votes:5, approved:true },
+  { id:'e2', name:'Ravi', caption:'Spicy chickpea bites', file:'https://images.unsplash.com/photo-1543353071-873f17a7a088?w=800&q=60', votes:12, approved:true },
+  { id:'e3', name:'Maya', caption:'Quick energy bars', file:'https://images.unsplash.com/photo-1551218808-94e220e084d2?w=800&q=60', votes:7, approved:true },
+  { id:'e4', name:'Liam', caption:'Baked samosa twist', file:'https://images.unsplash.com/photo-1604908553740-8a7f3df5b1b1?w=800&q=60', votes:2, approved:false }
+];
+let mockPaid = false;
+let pendingUploads = []; // unapproved
+let pendingPayments = []; // manual payments
 
-    function updateUTCTime() {
-      const now = new Date();
-      document.getElementById("utcTime").textContent = "UTC Time: " + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'UTC' });
-    }
-    setInterval(updateUTCTime, 1000);
-    updateUTCTime();
+/* ---------- UTILITY ---------- */
+let currentContestType = 'cook';
+function updateModalForType(type){
+  const map = {
+    'story': {title:'Storytelling — Short Story Stars', fee:30},
+    'cook': {title:'Best Healthy Snack', fee:50},
+    'fancy': {title:'Fancy Dress: Retro Challenge', fee:40},
+    'fashion': {title:'Stylish Dressing — Fashion Star', fee:60}
+  };
+  const info = map[type] || map['cook'];
+  document.querySelector('#contestModal h2').innerText = info.title + ' — Join';
+  document.querySelector('#contestModal .small').innerText = 'Category: ' + (type || 'Cooking') + ' • Fee: ₹' + info.fee;
+}
 
-    // New script for Investment Plans section and modal
-    const planDetails = {
-      weekly: {
-        title: "WEEKLY – 7 DAYS (BRONZE)",
-        description: [
-          "For first 100 clients only applicable.",
-          "Minimum investment: $100 to $10,000.",
-          "Return: 2% for the week only.",
-          "A client can invest only 3 times in the weekly plan, then they have to upgrade for the next basic-monthly, quarterly, half yearly etc., plans.",
-          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
-          "Example: A client invested $1000 on (10-02-2020) in weekly plan. After 7 days on (16-02-2020), they got invested profit of $20 for a week, and total amount of $1,020 can withdraw on the next day after plan expire (17-02-2020)."
-        ]
-      },
-      monthly: {
-        title: "MONTHLY – 30 DAYS (SILVER)",
-        description: [
-          "Minimum investment: $500 to $100,000.",
-          "Return: 4% for the month only.",
-          "A client can invest only 2 times in the Monthly plan, then they have to upgrade for the next quarterly, half yearly etc., plans.",
-          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
-          "Example: A client invested $10,000 on (1-03-2020) in monthly plan. After a month on (30-03-2020), they got invested profit of $400 for a month, and total amount of $10,400 can withdraw on the next day after plan expire (31-03-2020).",
-          "Client will get bonus of $5 for the upgradation of the silver plan."
-        ]
-      },
-      quarterly: {
-        title: "QUARTERLY – 3 MONTHS (GOLD)",
-        description: [
-          "Minimum investment: $500 to $1,000,000.",
-          "Return: 4.15% for the QUARTERLY (3 MONTHS) only.",
-          "A client can invest only 3 times in the QUARTERLY plan, then they have to upgrade for the next half yearly, annual etc., plans.",
-          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
-          "Example: A client invested $100,000 on (1-04-2020) in quarterly plan. After 3 months on (1-07-2020), they got invested profit of $12,450 for 3 months, and total amount of $112,450 can withdraw on the next day after plan expire (2-07-2020).",
-          "Client will get bonus of $10 for the upgradation of the gold plan."
-        ]
-      },
-      halfyearly: {
-        title: "HALF YEARLY – 6 MONTHS (GOLD PLUS)",
-        description: [
-          "Minimum investment: $1,000 to $1,000,000.",
-          "Return: 4.25% for the HALF YEARLY (6 MONTHS) only.",
-          "They can upgrade for the next- one year, 2 years, 3 years, 5 years etc., plans.",
-          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
-          "Example: A client invested $100,000 on (1-04-2020) in half yearly plan. After 6 months on (1-10-2020), they got invested profit of $25,500 for 6 months, and total amount of $125,500 can withdraw on the next day after plan expire (2-10-2020).",
-          "Client will get bonus of $20 for the upgradation of the gold plus plan."
-        ]
-      },
-      yearly: {
-        title: "YEARLY – 12 MONTHS (DIAMOND)",
-        description: [
-          "Minimum investment: $1,000 to $10,000,000.",
-          "Return: 4.35% for the YEARLY (12 MONTHS) only.",
-          "They can upgrade for the next- 2 years, 3 years, 5 years etc., plans.",
-          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
-          "Example: A client invested $100,000 on (1-04-2020) in yearly plan. After one year on (1-04-2021), they got invested profit of $52,200 for 12 months, and total amount of $152,200 can withdraw on the next day after plan expire (2-04-2021).",
-          "Client will get bonus of $20 for the upgradation of the diamond plan."
-        ]
-      },
-      twoyears: {
-        title: "TWO YEARS – 24 MONTHS (DIAMOND PLUS)",
-        description: [
-          "Minimum investment: $1,000 to $10,000,000.",
-          "Return: 4.45% for the 2 YEARS (24 MONTHS) only.",
-          "They can upgrade for the next- 3 years, 5 years etc., plans.",
-          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
-          "Example: A client invested $100,000 on (1-04-2020) in 2 years plan. After 2 years on (1-04-2022), they got invested profit of $106,800 for 24 months, and total amount of $206,800 can withdraw on the next day after plan expire (2-04-2022).",
-          "Client will get bonus of $40 for the upgradation of the diamond plus plan."
-        ]
-      },
-      threeyears: {
-        title: "THREE YEARS – 36 MONTHS (PLATINUM)",
-        description: [
-          "Minimum investment: $1,000 to $10,000,000.",
-          "Return: 4.50% for the 3 YEARS (36 MONTHS) only.",
-          "They can upgrade for the next- 5 years plan.",
-          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
-          "Example: A client invested $100,000 on (1-04-2020) in 3 years plan. After 3 years on (1-04-2023), they got invested profit of $162,000 for 36 months, and total amount of $262,000 can withdraw on the next day after plan expire (2-04-2023).",
-          "Client will get bonus of $60 for the upgradation of the PLATINUM plan."
-        ]
-      },
-      fiveyears: {
-        title: "FIVE YEARS – 60 MONTHS (PLATINUM PLUS)",
-        description: [
-          "Minimum investment: $1,000 to $10,000,000.",
-          "Return: 5% for the 5 YEARS (60 MONTHS) only.",
-          "After the expire of the plan, the client can withdraw both capital & profit of the invested amount.",
-          "Example: A client invested $100,000 on (1-04-2020) in 5 years plan. After 5 years on (1-04-2025), they got invested profit of $300,000 for 60 months, and total amount of $400,000 can withdraw on the next day after plan expire (2-04-2025).",
-          "Client will get bonus of $100 for the upgradation of the PLATINUM PLUS plan."
-        ]
-      }
-    };
+function $(id){ return document.getElementById(id) }
+function nowPlus(days=3){ return Date.now() + days*24*60*60*1000 }
 
-    // Get references to DOM elements for investment plans
-    const schemeList = document.querySelector('.scheme-list');
-    const modalOverlay = document.getElementById('modal-overlay');
-    const modalTitle = document.getElementById('modal-title');
-    const modalContent = document.getElementById('modal-content');
-    const closeBtn = document.getElementById('close-btn');
+/* ---------- COUNTDOWN ---------- */
+const contestEnd = new Date();
+contestEnd.setDate(contestEnd.getDate()+3);
+function updateCountdown(){
+  const d = contestEnd - new Date();
+  if (d<=0) { $('countdownLarge').innerText='Closed'; $('top-count').innerText='Closed'; $('statusBox').innerHTML = '<div class="small">Contest closed</div>'; return; }
+  const days = Math.floor(d/86400000); const hours = Math.floor((d%86400000)/3600000);
+  const mins = Math.floor((d%3600000)/60000); const secs = Math.floor((d%60000)/1000);
+  $('countdownLarge').innerText = `${days}d ${hours}h ${mins}m ${secs}s`;
+  $('top-count').innerText = `${days}d ${hours}h ${mins}m`;
+}
+setInterval(updateCountdown,1000); updateCountdown();
 
-    /**
-     * Displays the modal with the details of the selected plan.
-     * @param {string} planKey - The key of the plan to display (e.g., 'weekly', 'monthly').
-     */
-    function showPlanDetails(planKey) {
-      const plan = planDetails[planKey];
-      if (plan) {
-        modalTitle.textContent = plan.title;
-        modalContent.innerHTML = ''; // Clear previous content
+/* ---------- RENDER GALLERY ---------- */
+function renderGallery(){
+  const g = $('gallery'); g.innerHTML = '';
+  const visible = mockEntries.filter(e=>e.approved).sort((a,b)=>b.votes-a.votes);
+  visible.forEach(e=>{
+    const div = document.createElement('div'); div.className='entry';
+    div.innerHTML = `
+      ${e.file.endsWith('.mp4') ? `<video src="${e.file}" controls></video>` : `<img src="${e.file}" alt="entry"/>`}
+      <div class="meta"><div><strong>${e.name}</strong><div class="small">${e.caption||''}</div></div>
+      <div><span style="font-weight:700">${e.votes}</span> <button class="btn-muted" onclick="vote('${e.id}',this)">Vote</button></div></div>
+    `;
+    g.appendChild(div);
+  });
+  renderMiniLeaderboard();
+}
+function renderMiniLeaderboard(){
+  const lb = $('miniLeaderboard'); lb.innerHTML='';
+  const top = mockEntries.filter(e=>e.approved).sort((a,b)=>b.votes-a.votes).slice(0,5);
+  top.forEach(t=>{
+    const li = document.createElement('li'); li.innerText = `${t.name} — ${t.votes} votes`; lb.appendChild(li);
+  });
+  // detail top
+  const dt = $('detailTop'); dt.innerHTML = top.slice(0,3).map((t,idx)=>`<div class="small"><strong>#${idx+1}</strong> ${t.name} — ${t.votes}</div>`).join('');
+}
+renderGallery();
 
-        const ul = document.createElement('ul');
-        plan.description.forEach(item => {
-          const li = document.createElement('li');
-          li.textContent = item;
-          ul.appendChild(li);
-        });
-        modalContent.appendChild(ul);
+/* ---------- MOCK PAY ---------- */
+function mockPay(){
+  // create a "pending" payment then mark paid after 1s
+  const id = 'p_'+Date.now();
+  pendingPayments.push({ id, user:'you@example.com', amount:50, contest:'besthealthy', status:'PENDING' });
+  renderPendingPayments();
+  // simulate server webhook later
+  setTimeout(()=> {
+    // mark paid
+    const p = pendingPayments.find(x=>x.id===id);
+    if (p) { p.status='PAID'; mockPaid = true; alert('Payment simulated OK — your payment marked PAID'); renderPendingPayments(); }
+  }, 900);
+}
 
-        modalOverlay.classList.add('show');
-        modalOverlay.focus(); // Focus the modal for accessibility
-      } else {
-        modalTitle.textContent = "Plan Not Found";
-        modalContent.innerHTML = "<p>Details for this plan are not available.</p>";
-        modalOverlay.classList.add('show');
-        modalOverlay.focus();
-      }
-    }
+function renderPendingPayments(){
+  const el = $('pendingPayments'); el.innerHTML='';
+  pendingPayments.forEach(p=>{
+    const div = document.createElement('div'); div.style.borderBottom='1px solid #eee'; div.style.padding='6px 0';
+    div.innerHTML = `<div style="display:flex;justify-content:space-between"><div><strong>${p.user}</strong> • ₹${p.amount}</div><div class="small">${p.status}</div></div>`;
+    el.appendChild(div);
+  });
+}
 
-    /**
-     * Hides the modal.
-     */
-    function hideModal() {
-      modalOverlay.classList.remove('show');
-    }
+/* ---------- MOCK CONTEST MODAL ---------- */
+function openContest(type){ currentContestType = type || 'cook'; $('contestModal').style.display='flex'; checkUserPaidUI(); updateModalForType(type); }
+function closeContest(){ $('contestModal').style.display='none' }
 
-    // Event listener for clicking on investment scheme items
-    schemeList.addEventListener('click', (event) => {
-      const targetItem = event.target.closest('.scheme-item');
-      if (targetItem) {
-        const planKey = targetItem.dataset.plan;
-        showPlanDetails(planKey);
+function checkUserPaidUI(){
+  const uploadArea = $('uploadArea'); const paySection = $('paySection');
+  if (mockPaid) { uploadArea.style.display='block'; paySection.style.display='none'; }
+  else { uploadArea.style.display='block'; paySection.style.display='block'; /* allow manual too */ }
+}
+function markPaidManually(){
+  // admin will verify later in real app. For mock, mark pendingPayments and set paid flag
+  const id = 'manual_'+Date.now();
+  pendingPayments.push({ id, user:'you@example.com', amount:50, contest:'besthealthy', status:'MANUAL_PENDING' });
+  renderPendingPayments();
+  alert('Marked as “I have paid”. Admin must verify. In this mock, open Admin panel and click Verify.');
+}
 
-        // Update aria-selected for accessibility
-        document.querySelectorAll('.scheme-item').forEach(item => {
-          item.setAttribute('aria-selected', 'false');
-        });
-        targetItem.setAttribute('aria-selected', 'true');
-      }
-    });
+/* ---------- MOCK SUBMIT ENTRY ---------- */
+function submitMockEntry(){
+  const fileInput = $('entryFile');
+  const caption = $('captionInput').value || '';
+  if (!fileInput.files || fileInput.files.length===0) return alert('Choose a file first (mock: reads file name only)');
+  const f = fileInput.files[0];
+  // create object URL preview and push to pendingUploads
+  const id = 'u'+Date.now();
+  const url = URL.createObjectURL(f);
+  pendingUploads.push({ id, name:'You', caption, file:url, votes:0, approved:false });
+  renderPendingUploads();
+  alert('Entry submitted! It will appear in Gallery after admin approves (mock). Close modal and open Admin to approve.');
+  closeContest();
+}
 
-    // Event listener for keyboard navigation (Enter/Space) on investment scheme items
-    schemeList.addEventListener('keydown', (event) => {
-      const targetItem = event.target.closest('.scheme-item');
-      if (targetItem && (event.key === 'Enter' || event.key === ' ')) {
-        event.preventDefault(); // Prevent default scroll behavior for spacebar
-        const planKey = targetItem.dataset.plan;
-        showPlanDetails(planKey);
+/* ---------- VOTING (client-side mock, 1 per session) ---------- */
+const votedSet = new Set();
+function vote(entryId, btn){
+  if (votedSet.has(entryId)) { alert('You already voted in this session (mock restriction).'); return; }
+  // find entry
+  const e = mockEntries.find(x=>x.id===entryId);
+  if (e) { e.votes++; votedSet.add(entryId); renderGallery(); }
+  else {
+    // maybe in pendingUploads
+    const p = pendingUploads.find(x=>x.id===entryId);
+    if (p) { p.votes++; votedSet.add(entryId); renderPendingUploads(); }
+  }
+}
 
-        // Update aria-selected for accessibility
-        document.querySelectorAll('.scheme-item').forEach(item => {
-          item.setAttribute('aria-selected', 'false');
-        });
-        targetItem.setAttribute('aria-selected', 'true');
-      }
-    });
+/* ---------- PENDING UPLOADS UI ---------- */
+function renderPendingUploads(){
+  const el = $('pendingList'); el.innerHTML='';
+  pendingUploads.forEach(u=>{
+    const div = document.createElement('div'); div.style.padding='8px'; div.style.borderBottom='1px solid #eee';
+    div.innerHTML = `<div><strong>${u.name}</strong> • ${u.caption}</div><div style="margin-top:6px"><button class="btn" onclick="approveMock('${u.id}')">Approve</button> <button class="btn-muted" onclick="rejectMock('${u.id}')">Reject</button></div>`;
+    el.appendChild(div);
+  });
+}
+function approveMock(id){
+  const idx = pendingUploads.findIndex(x=>x.id===id);
+  if (idx===-1) return;
+  const item = pendingUploads.splice(idx,1)[0];
+  item.approved = true; item.id = 'm'+Date.now();
+  mockEntries.push(item);
+  renderPendingUploads(); renderGallery();
+}
+function rejectMock(id){ if (!confirm('Reject this upload?')) return; pendingUploads = pendingUploads.filter(x=>x.id!==id); renderPendingUploads(); }
 
-    // Event listener for closing the modal via the close button
-    closeBtn.addEventListener('click', hideModal);
+/* ---------- ADMIN TOOLS ---------- */
+function openAdmin(){ $('adminPanel').style.display='block'; renderPendingUploads(); renderPendingPayments(); }
+function closeAdmin(){ $('adminPanel').style.display='none' }
+function approveAllMock(){ pendingUploads.forEach(u=>{ u.approved=true; u.id='m'+Date.now()+Math.random(); mockEntries.push(u); }); pendingUploads=[]; renderPendingUploads(); renderGallery(); alert('All pending approved (mock)'); }
+function awardWinnersMock(){
+  // find top 10 by votes and tag as winners
+  const winners = mockEntries.filter(e=>e.approved).sort((a,b)=>b.votes-a.votes).slice(0,10);
+  winners.forEach((w,idx)=>{ w.rank = idx+1; });
+  alert('Top winners awarded (mock). Check leaderboard.');
+  renderGallery();
+}
 
-    // Event listener for closing the modal by clicking outside it
-    modalOverlay.addEventListener('click', (event) => {
-      if (event.target === modalOverlay) {
-        hideModal();
-      }
-    });
+/* ---------- INIT: pending lists empty ---------- */
+renderPendingUploads(); renderPendingPayments();
 
-    // Event listener for closing the modal with the Escape key
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && modalOverlay.classList.contains('show')) {
-        hideModal();
-      }
-    });
+/* ---------- For demo: insert one unapproved file to pendingUploads ---------- */
+pendingUploads.push({ id:'p0', name:'Kavya', caption:'Fusion salad', file:'https://images.unsplash.com/photo-1510626176961-4b57e53f7d2b?w=800&q=60', votes:0, approved:false });
+renderPendingUploads();
 
-    // --- Three.js 3D Animation for Header ---
-    let scene, camera, renderer, sphere, points; // Declare points globally too
-
-    // Variables for blinking effect
-    let blinkOpacity = 0.3; // Starting opacity
-    let blinkDirection = 1; // 1 for increasing, -1 for decreasing
-    const blinkSpeed = 0.005; // How fast it blinks
-    const minOpacity = 0.1;
-    const maxOpacity = 0.5;
-
-    function initThreeJS() {
-      const canvas = document.getElementById('three-canvas');
-      if (!canvas) {
-        console.error("Three.js canvas not found!");
-        return;
-      }
-
-      // Scene setup
-      scene = new THREE.Scene();
-
-      // Camera setup
-      camera = new THREE.PerspectiveCamera(75, window.innerWidth / canvas.clientHeight, 0.1, 1000);
-      camera.position.z = 2;
-
-      // Renderer setup
-      renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true }); // alpha: true for transparent background
-      renderer.setSize(window.innerWidth, canvas.clientHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
-
-      // Create a network sphere (abstract blockchain/data representation)
-      const geometry = new THREE.IcosahedronGeometry(1, 1); // Radius 1, detail 1
-      const material = new THREE.LineBasicMaterial({ color: 0x88ccff, transparent: true, opacity: blinkOpacity }); // Light blue lines
-      const edges = new THREE.EdgesGeometry(geometry);
-      sphere = new THREE.LineSegments(edges, material);
-      scene.add(sphere);
-
-      // Add some subtle points for a 'star' effect
-      const pointsMaterial = new THREE.PointsMaterial({
-        color: 0xb9f2ff, // Light cyan points
-        size: 0.05,
-        transparent: true,
-        opacity: blinkOpacity
-      });
-      points = new THREE.Points(geometry, pointsMaterial);
-      scene.add(points);
-
-      // Animation loop
-      const animateThreeJS = () => {
-        requestAnimationFrame(animateThreeJS);
-
-        // Update blinking opacity
-        blinkOpacity += blinkDirection * blinkSpeed;
-        if (blinkOpacity > maxOpacity || blinkOpacity < minOpacity) {
-          blinkDirection *= -1; // Reverse direction
-          blinkOpacity = Math.max(minOpacity, Math.min(maxOpacity, blinkOpacity)); // Clamp value
-        }
-
-        // Apply blinking opacity to sphere and points
-        if (sphere && sphere.material) {
-          sphere.material.opacity = blinkOpacity;
-        }
-        if (points && points.material) {
-          points.material.opacity = blinkOpacity;
-        }
-
-        // Rotate the sphere and points
-        if (sphere) {
-          sphere.rotation.x += 0.0005;
-          sphere.rotation.y += 0.001;
-        }
-        if (points) {
-          points.rotation.x += 0.0005;
-          points.rotation.y += 0.001;
-        }
-
-        renderer.render(scene, camera);
-      };
-
-      animateThreeJS();
-
-      // Handle window resize
-      window.addEventListener('resize', () => {
-        const newWidth = window.innerWidth;
-        const newHeight = canvas.clientHeight; // Keep height based on CSS
-        camera.aspect = newWidth / newHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(newWidth, newHeight);
-      });
-    }
-
-    // --- Scroll-triggered Animations ---
-    const animatedSections = document.querySelectorAll('.animated-section');
-
-    const observerOptions = {
-      root: null, /* viewport */
-      rootMargin: '0px',
-      threshold: 0.2 /* 20% of element visible to trigger */
-    };
-
-    const observer = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target); // Stop observing once animated
-        }
-      });
-    }, observerOptions);
-
-    // Observe each section
-    animatedSections.forEach(section => {
-      observer.observe(section);
-    });
-
-    // --- Back to Top Button Logic ---
-    const backToTopBtn = document.getElementById("backToTopBtn");
-
-    // When the user scrolls down 200px from the top of the document, show the button
-    window.onscroll = function() { scrollFunction() };
-
-    function scrollFunction() {
-      if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-        backToTopBtn.style.display = "block";
-      } else {
-        backToTopBtn.style.display = "none";
-      }
-    }
-
-    // When the user clicks on the button, scroll to the top of the document
-    function topFunction() {
-      document.body.scrollTop = 0; // For Safari
-      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-    }
-
-    // --- Copy Email to Clipboard ---
-    const emailLink = document.getElementById('emailLink');
-    if (emailLink) {
-      emailLink.addEventListener('click', function(e) {
-        e.preventDefault(); // Prevent default mailto: action
-        const emailAddress = "apdpsolutions@gmail.com"; // Your email address
-        
-        // Use document.execCommand for broader compatibility in iframes
-        const tempInput = document.createElement('input');
-        tempInput.value = emailAddress;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-
-        // Provide visual feedback
-        const originalText = emailLink.innerHTML;
-        emailLink.innerHTML = '<i class="fas fa-check"></i> Copied!';
-        setTimeout(() => {
-          emailLink.innerHTML = originalText;
-        }, 2000);
-      });
-    }
-
-    // Initialize Three.js and other functions when the window loads
-    window.onload = function() {
-      initThreeJS();
-      updateUTCTime();
-      // Start typing animation after a slight delay to ensure CSS is loaded
-      const subtitleElement = document.getElementById('header-subtitle');
-      if (subtitleElement) {
-        subtitleElement.style.width = '0'; /* Reset width to start animation */
-        subtitleElement.style.animation = 'typing 3s forwards, blink-caret .75s step-end infinite';
-        subtitleElement.style.animationDelay = '1.5s';
-      }
-    };
-  </script>
+</script>
 </body>
 </html>
+
+
+Zoko Talent — Preview & Starter Package
+======================================
+
+Contents:
+- index.html : interactive static mockup (open in browser)
+- client/: sample React component stubs and firebase config templates
+- server/: sample Node Express Razorpay server (create-order + webhook)
+- functions/: sample Firebase Cloud Function webhook example
+- firestore.rules : suggested Firestore security rules
+
+How to use:
+1. Download and unzip this package.
+2. Open index.html in a browser to see the mockup preview.
+3. For a working app, follow instructions in client/README.md to scaffold a React app and plug in Firebase keys.
+4. To enable payments, deploy the server or Cloud Function and configure Razorpay credentials and webhook.
+
+If you want, I can also create a full GitHub repo for this package and push the files there — you'll need to provide a connected GitHub account or I can give you instructions to create the repo locally and push.
